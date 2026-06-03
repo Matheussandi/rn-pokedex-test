@@ -8,7 +8,7 @@ The purpose of this test is to assess your logical reasoning ability, as well as
 
 A customer needs a simple **SpaceX launches explorer** app. Your role is to build a mobile application that allows users to browse SpaceX launches, visualize mission details, and keep track of their favorite missions.
 
-The app consumes data from the [SpaceX GraphQL API](https://spacex-production.up.railway.app/), which is already configured and running. You don't need to build or modify any backend — just consume it.
+The app consumes data from the [SpaceX GraphQL API](https://spacex-production.up.railway.app/), which is already configured and running. You don't need to build or modify any backend, just consume it.
 
 ### Screens
 
@@ -38,7 +38,7 @@ A screen (or a persistent section visible from the list) that shows aggregate in
 - Success rate (as a percentage);
 - Number of distinct rockets used.
 
-These values must be derived from the data returned by the API — not hardcoded.
+These values must be derived from the data returned by the API, not hardcoded.
 
 ### Important notes
 
@@ -46,16 +46,13 @@ These values must be derived from the data returned by the API — not hardcoded
 - The SpaceX GraphQL API is public and requires no authentication. The endpoint is pre-configured in the boilerplate. You can explore the schema at [`https://spacex-production.up.railway.app/`](https://spacex-production.up.railway.app/);
 - The API is maintained by the community and may occasionally be slow or unavailable. Plan for that;
 - You are free to organize the folder structure as you see fit, but keep it coherent and justifiable;
-- There is no design specification to follow — layout and visual decisions are yours to make.
+- There is no design specification to follow. Layout and visual decisions are yours to make.
 
 ## Technical guidelines
 
-- The project uses **Expo** (managed workflow). Do not eject;
-- Styles must be written using **Unistyles 3**. Do not introduce a second styling solution alongside it;
+- The project uses **Expo** (managed workflow). Do not eject it;
 - Navigation must use **Expo Router**;
-- Data fetching must go through the pre-configured **GraphQL client**. Do not replace it or add REST calls for data that is available via GraphQL;
-- Local persistence for favorites must use **AsyncStorage** or **Expo SecureStore** — your choice, but be ready to justify it;
-- The codebase must be in **TypeScript** throughout. Avoid `any`.
+- The codebase must be written in **TypeScript**.
 
 ## What will be evaluated
 
@@ -76,13 +73,12 @@ These values must be derived from the data returned by the API — not hardcoded
 ## What we would like to see
 
 - Unit and component tests written with **Jest** and **React Native Testing Library**;
-- At least one **Maestro** flow covering the happy path of the launches list;
-- Thoughtful error states and loading indicators — the API can be slow or fail.
+- One or more **Maestro** flows covering the happy path of the app;
+- Thoughtful error states and loading indicators, since the API can be slow or fail.
 
 ## What would be nice to see (if you have enough time)
 
 - A **Playwright** test covering the web target (Expo supports web out of the box);
-- The app deployed via **Expo Go** link or **EAS Update** so we can run it directly on our devices;
 - Animated transitions between screens or list states.
 
 ## Deadline
@@ -107,14 +103,6 @@ The repository must contain a `README.md` file with step-by-step instructions on
 - Run `yarn` to install dependencies;
 - Run `yarn start` to start the Expo development server;
 - Scan the QR code with Expo Go or press `i` / `a` to open the app in a simulator.
-
-To run the tests:
-
-```bash
-yarn test           # Jest + RNTL
-yarn test:e2e       # Maestro (requires Maestro CLI installed)
-yarn test:web       # Playwright (requires `yarn web` running in another terminal)
-```
 
 ## Any questions?
 
