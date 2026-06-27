@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import {
   ActivityIndicator,
   FlatList,
+  Modal,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -28,22 +29,24 @@ export function PokemonListView(props: PokemonListViewProps) {
   const {
     pokemons,
     types,
-    searchText,
-    selectedType,
+    draftSearch,
+    draftType,
     isInitialLoading,
     isLoadingMore,
     isRefreshing,
     error,
-    hasMore,
-    networkStatus,
-    setSearchText,
-    setSelectedType,
+    setDraftSearch,
+    setDraftType,
+    clearFilters,
+    applyFilters,
     loadMore,
     refresh,
     refetch,
     openDetail,
     isFavorite,
     toggleFavorite,
+    isFilterModalVisible,
+    closeFilterModal,
   } = props;
 
   if (isInitialLoading) {
@@ -51,46 +54,74 @@ export function PokemonListView(props: PokemonListViewProps) {
   }
 
   if (error && pokemons.length === 0) {
-    return <ErrorState 
-    title="Erro ao carregar Pokémon"
-    message="A API pode estar lenta ou indisponível. Tente novamente."
-    onRetry={refetch}
-    />
+    return (
+      <ErrorState
+        title="Erro ao carregar Pokémon"
+        message="A API pode estar lenta ou indisponível. Tente novamente."
+        onRetry={refetch}
+      />
+    );
   }
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Buscar por nome..."
-        placeholderTextColor="#9CA3AF"
-        value={searchText}
-        onChangeText={
-          (text) => setSearchText(text)
-        }
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filterRow}
+      <Modal
+        visible={isFilterModalVisible}
+        statusBarTranslucent
+        transparent
+        animationType="slide"
+        onRequestClose={closeFilterModal}
       >
-        <FilterChip
-          label="Todos"
-          selected={selectedType === null}
-          onPress={() => setSelectedType(null)}
-        />
-        {types.map((type) => (
-          <FilterChip
-            key={type.id}
-            label={capitalizeName(type.name)}
-            selected={selectedType === type.name}
-            onPress={() => setSelectedType(type.name)}
-          />
-        ))}
-      </ScrollView>
+        <Pressable style={styles.modalOverlay} onPress={closeFilterModal}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filtros</Text>
+              <Pressable onPress={closeFilterModal} hitSlop={8}>
+                <Ionicons name="close" size={24} color="#111827" />
+              </Pressable>
+            </View>
+
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar por nome..."
+              placeholderTextColor="#9CA3AF"
+              value={draftSearch}
+              onChangeText={setDraftSearch}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.typeRow}
+            >
+              <FilterChip
+                label="Todos"
+                selected={draftType === null}
+                onPress={() => setDraftType(null)}
+              />
+              {types.map((type) => (
+                <FilterChip
+                  key={type.id}
+                  label={capitalizeName(type.name)}
+                  selected={draftType === type.name}
+                  onPress={() => setDraftType(type.name)}
+                />
+              ))}
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              <Pressable style={styles.clearButton} onPress={clearFilters}>
+                <Text style={styles.clearButtonText}>Limpar</Text>
+              </Pressable>
+              <Pressable style={styles.applyButton} onPress={applyFilters}>
+                <Text style={styles.applyButtonText}>Filtrar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
 
       <FlatList
         data={pokemons}
@@ -190,6 +221,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9FAFB",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#F9FAFB",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
   centered: {
     flex: 1,
     alignItems: "center",
@@ -198,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
   },
   searchInput: {
-    margin: 16,
+    marginHorizontal: 16,
     marginBottom: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -209,10 +264,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#111827",
   },
-  filterRow: {
+  typeRow: {
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 16,
     gap: 8,
+  },
+  modalActions: {
+    gap: 12,
+    paddingHorizontal: 16,
+  },
+  clearButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    alignItems: "center",
+  },
+  clearButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#374151",
+  },
+  applyButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#E3350D",
+    alignItems: "center",
+  },
+  applyButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   chip: {
     paddingHorizontal: 14,
@@ -236,7 +319,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingTop: 8,
     gap: 12,
   },
   emptyList: {

@@ -19,17 +19,19 @@ export function usePokemonListModel() {
   const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const [searchText, setSearchText] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [appliedType, setAppliedType] = useState<string | null>(null);
+  const [draftSearch, setDraftSearch] = useState("");
+  const [draftType, setDraftType] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
   const searchVariable = useMemo(() => {
-    const trimmed = debouncedSearch.trim();
+    const trimmed = appliedSearch.trim();
     return trimmed ? `%${trimmed}%` : "%";
-  }, [debouncedSearch]);
+  }, [appliedSearch]);
 
   const listVariables = useMemo(
     () => ({
@@ -43,9 +45,9 @@ export function usePokemonListModel() {
   const typedListVariables = useMemo(
     () => ({
       ...listVariables,
-      type: selectedType ?? "",
+      type: appliedType ?? "",
     }),
-    [listVariables, selectedType],
+    [listVariables, appliedType],
   );
 
   const {
@@ -57,7 +59,7 @@ export function usePokemonListModel() {
   } = useQuery(PokemonListDocument, {
     variables: listVariables,
     notifyOnNetworkStatusChange: true,
-    skip: !!selectedType,
+    skip: !!appliedType,
   });
 
   const {
@@ -69,14 +71,14 @@ export function usePokemonListModel() {
   } = useQuery(PokemonListByTypeDocument, {
     variables: typedListVariables,
     notifyOnNetworkStatusChange: true,
-    skip: !selectedType,
+    skip: !appliedType,
   });
 
-  const data = selectedType ? typedListData : listData;
-  const loading = selectedType ? typedListLoading : listLoading;
-  const error = selectedType ? typedListError : listError;
-  const networkStatus = selectedType ? typedListNetworkStatus : listNetworkStatus;
-  const refetch = selectedType ? refetchTypedList : refetchList;
+  const data = appliedType ? typedListData : listData;
+  const loading = appliedType ? typedListLoading : listLoading;
+  const error = appliedType ? typedListError : listError;
+  const networkStatus = appliedType ? typedListNetworkStatus : listNetworkStatus;
+  const refetch = appliedType ? refetchTypedList : refetchList;
 
   const { data: typesData } = useQuery(PokemonTypesDocument);
 
@@ -102,12 +104,12 @@ export function usePokemonListModel() {
         limit: PAGE_SIZE,
         offset: 0,
         search: searchVariable,
-        ...(selectedType ? { type: selectedType } : {}),
+        ...(appliedType ? { type: appliedType } : {}),
       });
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetch, searchVariable, selectedType]);
+  }, [refetch, searchVariable, appliedType]);
 
   const openDetail = useCallback(
     (id: number) => {
@@ -116,15 +118,31 @@ export function usePokemonListModel() {
     [router],
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchText), 300);
-    return () => clearTimeout(timer);
-  }, [searchText]);
+  const openFilterModal = useCallback(() => {
+    setDraftSearch(appliedSearch);
+    setDraftType(appliedType);
+    setIsFilterModalVisible(true);
+  }, [appliedSearch, appliedType]);
+
+  const closeFilterModal = useCallback(() => {
+    setIsFilterModalVisible(false);
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    setDraftSearch("");
+    setDraftType(null);
+  }, []);
+
+  const applyFilters = useCallback(() => {
+    setAppliedSearch(draftSearch);
+    setAppliedType(draftType);
+    setIsFilterModalVisible(false);
+  }, [draftSearch, draftType]);
 
   useEffect(() => {
     setOffset(0);
     setPokemons([]);
-  }, [debouncedSearch, selectedType]);
+  }, [appliedSearch, appliedType]);
 
   useEffect(() => {
     if (!data?.pokemon) {
@@ -142,21 +160,26 @@ export function usePokemonListModel() {
   return {
     pokemons,
     types,
-    searchText,
-    selectedType,
+    draftSearch,
+    draftType,
     isInitialLoading,
     isLoadingMore,
     isRefreshing,
     error,
     hasMore,
     networkStatus,
-    setSearchText,
-    setSelectedType,
+    setDraftSearch,
+    setDraftType,
+    clearFilters,
+    applyFilters,
     loadMore,
     refresh,
     refetch,
     openDetail,
     isFavorite,
     toggleFavorite,
+    isFilterModalVisible,
+    openFilterModal,
+    closeFilterModal,
   };
 }
