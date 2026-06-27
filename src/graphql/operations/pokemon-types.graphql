@@ -1,0 +1,6 @@
+query PokemonTypes {
+  type(order_by: { name: asc }) {
+    id
+    name
+  }
+}

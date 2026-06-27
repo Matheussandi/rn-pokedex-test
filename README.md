@@ -1,113 +1,101 @@
-# React Native Recruitment Test
+# Pokédex Explorer
 
-This is the briefing for the test to join the Hubs Contabilidade Technology Team. Welcome!
+Aplicativo mobile de exploração de Pokémon construído com Expo e React Native. Consome a [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) para listar Pokémon, exibir detalhes, gerenciar favoritos e mostrar estatísticas agregadas.
 
-The purpose of this test is to assess your logical reasoning ability, as well as your mobile development skills, system integrations, code organization, creativity, independence, and problem-solving.
+O briefing original do teste técnico está em [TECHNICAL_TEST.md](./TECHNICAL_TEST.md).
 
-## The challenge
+## Pré-requisitos
 
-A customer needs a simple **data explorer** app. Your role is to build a mobile application that allows users to browse a list of items from a public GraphQL API, visualize item details, and keep track of their favorites.
+- Node.js >= 18
+- Yarn
+- Expo Go (dispositivo físico) ou simulador iOS/Android configurado
 
-The app should consume data from a **public GraphQL API of your choice**. You don't need to build or modify any backend, just consume it. Some suggestions to get you started:
+> Para módulos nativos (ex.: AsyncStorage), use `npx expo install <pacote>` em vez de `yarn add` diretamente — isso garante compatibilidade com o SDK do Expo.
 
-- [SpaceX GraphQL API](https://spacex-production.up.railway.app/) — launches, rockets, missions;
-- [Rick and Morty GraphQL API](https://rickandmortyapi.com/documentation) — characters, episodes, locations;
-- [Pokémon GraphQL API](https://pokeapi.co/docs/graphql) — Pokémon, types, abilities.
+## Como rodar
 
-Feel free to pick any other public GraphQL API you'd like, as long as it fits the screens and requirements described below. Adapt the entities mentioned (e.g. "mission", "launch") to whichever domain your chosen API covers (e.g. "character", "episode", "Pokémon").
+```bash
+# Instalar dependências
+yarn
 
-### Screens
+# Gerar tipos GraphQL (requer acesso à API)
+yarn codegen
 
-The app must contain at least the following screens:
+# Iniciar o servidor de desenvolvimento
+yarn start
+```
 
-#### 1. Items List
+Escaneie o QR code com o Expo Go ou pressione `i` / `a` para abrir no simulador, ou `w` para o navegador.
 
-A scrollable list of items from your chosen API. Each item must display at minimum:
+## Scripts disponíveis
 
-- A name or title;
-- A couple of relevant secondary fields (e.g. date, type, location, status);
-- A visual indicator of whether the item is marked as a favorite.
+| Script | Descrição |
+|--------|-----------|
+| `yarn start` | Inicia o Expo dev server |
+| `yarn android` | Abre no emulador Android |
+| `yarn ios` | Abre no simulador iOS |
+| `yarn web` | Abre no navegador |
+| `yarn codegen` | Gera tipos e hooks Apollo a partir das queries GraphQL |
+| `yarn codegen:watch` | Codegen em modo watch |
+| `yarn lint` | Executa o linter |
+| `yarn test` | Roda todos os testes |
+| `yarn test:watch` | Roda testes em modo watch |
 
-The list must support **filtering by a relevant status field** (e.g. launch success, character status, Pokémon type) and **searching by name**.
+## Testes
 
-#### 2. Item Detail
+```bash
+yarn test          # roda todos os testes
+yarn test:watch    # modo watch
+```
 
-A detail screen for a single item, accessible from the list. It must display all relevant fields available in the API and allow the user to **toggle the favorite status** of that item. Favorites must be **persisted locally** — they should survive an app restart.
+## API utilizada
 
-#### 3. Stats
+- **Endpoint:** `https://graphql.pokeapi.co/v1beta2`
+- **Console GraphiQL:** [graphql.pokeapi.co/v1beta2/console](https://graphql.pokeapi.co/v1beta2/console/)
 
-A screen (or a persistent section visible from the list) that shows aggregate information derived from the fetched data, such as:
+### Limitações conhecidas
 
-- Total number of items;
-- A relevant rate or percentage (e.g. success rate, percentage of a given status or type);
-- Number of distinct categories (e.g. rockets, species, types).
+- Rate limit de ~100 requisições/hora por IP
+- API pode ficar lenta ou indisponível (manutenção diária ~2 min às 01:00 UTC)
+- O app usa `cache-first` no Apollo Client e paginação para respeitar o fair use
 
-These values must be derived from the data returned by the API, not hardcoded.
+## Estrutura do projeto
 
-### Important notes
+```
+src/
+  app/                    # Rotas Expo Router (finas, apenas re-exportam features)
+    (tabs)/               # Abas: Pokédex | Stats
+    pokemon/[id].tsx      # Detalhe do Pokémon
+  features/               # MVVM por feature
+    pokemon-list/
+      pokemon-model.ts    # ViewModel (estado, queries, ações)
+      pokemon-view.tsx    # UI pura
+      index.tsx           # Composição model + view
+    pokemon-detail/
+    pokemon-stats/
+  graphql/
+    client.ts             # Apollo Client
+    operations/           # Queries .graphql
+    generated/            # Tipos e hooks gerados pelo codegen
+  lib/
+    favorites.ts          # Persistência de favoritos (AsyncStorage)
+    pokemon-image.ts      # Helper de URL de sprite
+```
 
-- The chosen GraphQL API must be public and require no authentication. The API is maintained by the community and may occasionally be slow or unavailable. Plan for that;
-- You are free to organize the folder structure as you see fit, but keep it coherent and justifiable;
-- There is no design specification to follow. Layout and visual decisions are yours to make.
+## Padrão MVVM
 
-## Technical guidelines
+Cada feature segue a mesma tríade de arquivos:
 
-- The project should use **Expo** (managed workflow);
-- Navigation must use **Expo Router**;
-- The codebase must be written in **TypeScript**;
-- Use **Apollo Client** (`@apollo/client`) as the GraphQL client to connect to the chosen API.
+- **pokemon-model.ts** — hook com lógica de negócio, estado e integração Apollo
+- **pokemon-view.tsx** — componente de UI que recebe props, sem fetch direto
+- **index.tsx** — conecta o model à view
 
-## What will be evaluated
+Rotas em `src/app/` não contêm lógica de negócio.
 
-- The overall organization of your code;
-- The technical level of the implementation;
-- How well you understand and work within an existing codebase;
-- The level of creativity and polish in the implementation.
+## Funcionalidades
 
-## What we don't recommend doing
-
-- Asking someone to code your test for you;
-- Using code generated by AI like ChatGPT, Claude Code, Gemini, or similar (we want to evaluate your skills, not the AI's);
-- Changing the scope of the project too much;
-- Wasting a lot of time doing cool but not very useful things. It's tempting, but focus on finishing what the test asks for first :)
-
-> Please keep in mind that we're not evaluating whether you can build up an application with a million complex features. Do what you can within your available time. A polished, high-quality implementation of the core requirements is more valuable than a project with many incomplete or buggy features.
-
-## What we would like to see
-
-- Unit and component tests written with **Jest** and **React Native Testing Library**;
-- Thoughtful error states and loading indicators, since the API can be slow or fail.
-
-## What would be nice to see (if you have enough time)
-
-- One or more **Maestro** flows covering the happy path of the app;
-- A **Playwright** test covering the web target (Expo supports web out of the box).
-
-## Deadline
-
-We expect you to finish your code within `1 week` from the day you received the test.
-
-The rest is up to you! Good luck!
-
-## How to submit your project
-
-You must send us an email to `tecnologia@hubscontabilidade.com.br` with the link to your forked repository containing your source code.
-
-The repository must contain a `README.md` file with step-by-step instructions on how to run your application and, if necessary, additional instructions.
-
-> If you are not comfortable creating a public repository for any reason, please create a private repository and share it with us, or feel free to share a `.zip` file with your delivery.
-
-## General setup instructions
-
-> To run this test, we assume you already have **Node.js >= 18**, **Yarn**, and the **Expo CLI** installed on your machine. You will also need either the **Expo Go** app on a physical device or a properly configured iOS/Android simulator. If not, you'll need to figure out how to set this up yourself first.
-
-- Fork and clone this repository so you can version your changes;
-- Run `yarn` to install dependencies;
-- Run `yarn start` to start the Expo development server;
-- Scan the QR code with Expo Go or press `i` / `a` to open the app in a simulator or `w` to open the app in the browser.
-
-> This repository already contains a pre-configured base Expo app (with TypeScript and Expo Router set up), so you can focus on building the features described above instead of project setup.
-
-## Any questions?
-
-Please contact us by email at `tecnologia@hubscontabilidade.com.br`. We do not promise to be able to answer all questions, but we will do our best to get back to you as quickly as possible.
+- Lista paginada de Pokémon com busca por nome e filtro por tipo
+- Tela de detalhe com stats, habilidades e informações da espécie
+- Favoritos persistidos localmente (sobrevivem ao restart)
+- Aba de estatísticas com totais e percentuais derivados da API
+- Estados de loading, erro com retry e empty state

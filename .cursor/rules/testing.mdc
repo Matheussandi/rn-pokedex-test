@@ -1,0 +1,55 @@
+---
+description: Estratégia e convenções de testes unitários
+alwaysApply: false
+---
+
+# Testes
+
+## Stack
+
+- **Jest** com preset `jest-expo` (configuração recomendada pela [documentação oficial do Expo](https://docs.expo.dev/develop/unit-testing/))
+- **@testing-library/react-native** para testes de hooks e componentes
+- **test-renderer** (React 19+) — substitui o `react-test-renderer` deprecado
+
+## Comandos
+
+```bash
+yarn test          # roda todos os testes
+yarn test:watch    # modo watch
+```
+
+## Estratégia adotada
+
+Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo de setup. Evitamos mocks pesados de Apollo, Expo Router e componentes nativos.
+
+| Arquivo de teste | O que cobre | Por quê |
+|---|---|---|
+| `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual, sim/não | Lógica condicional e fallbacks |
+| `src/utils/pokemon-image.test.ts` | URL de imagem com fallback, ID formatado, capitalização | Fallback de artwork vs CDN |
+| `src/utils/array.test.ts` | `mergeById` — deduplicação na paginação | Bug silencioso em scroll infinito |
+| `src/lib/favorites.test.ts` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
+
+## O que foi excluído intencionalmente
+
+- **Models** (`pokemon-model.ts`) — lógica acoplada a `useQuery`, `useRouter` e `useLocalSearchParams`; mocks complexos para pouco ganho
+- **Views** (lista, detalhe, stats) — dependem de FlatList, Modal, `expo-image`; setup pesado para cobertura baixa
+- **Componentes de infraestrutura** (`Loading`, `ErrorState`) — sem lógica de negócio
+
+## Como adicionar novos testes
+
+1. Criar arquivo `*.test.ts` ou `*.test.tsx` ao lado do módulo testado (o preset `jest-expo` reconhece `-test.ts|tsx` e `*.test.ts|tsx`)
+2. Para hooks, usar `await renderHook()` — na v14 do RTL, `renderHook` retorna uma `Promise`
+3. Para AsyncStorage, usar o mock oficial:
+
+```ts
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
+);
+```
+
+4. Instalar novas deps de teste via `yarn expo install <pacote> --dev` para garantir compatibilidade com o SDK
+
+## Configuração
+
+- `jest.config.js` — preset `jest-expo` + alias `@/`
+- `jest.setup.js` — define `IS_REACT_ACT_ENVIRONMENT` para React 19

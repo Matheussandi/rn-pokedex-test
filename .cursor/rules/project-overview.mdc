@@ -1,0 +1,37 @@
+---
+description: Visão geral do projeto Pokédex Explorer
+alwaysApply: true
+---
+
+# Pokédex Explorer
+
+App React Native (Expo 56) que consome a PokéAPI GraphQL v1beta2.
+
+## Stack
+
+- Expo Router para navegação (tabs + stack)
+- TypeScript strict
+- Apollo Client com codegen (`yarn codegen`)
+- AsyncStorage para favoritos locais
+- `@expo/vector-icons` (Ionicons) para todos os ícones
+
+## API
+
+- Endpoint: `https://graphql.pokeapi.co/v1beta2`
+- Rate limit ~100 req/h — usar `cache-first` e paginação
+- Pode ficar indisponível — sempre tratar loading/erro
+
+## Estrutura
+
+- `src/app/` — rotas finas (apenas re-exportam features)
+- `src/features/<nome>/` — MVVM (pokemon-model, pokemon-view, index)
+- `src/graphql/operations/` — queries `.graphql`
+- `src/graphql/generated/` — tipos gerados (não editar manualmente)
+- `src/lib/` — utilitários compartilhados
+
+## Convenções
+
+- Código simples e objetivo
+- Sem lógica de negócio em `src/app/`
+- Nomes de Pokémon capitalizados na UI
+- Briefing do teste em `TECHNICAL_TEST.md`

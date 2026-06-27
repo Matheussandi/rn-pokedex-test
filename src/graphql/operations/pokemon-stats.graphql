@@ -1,0 +1,19 @@
+query PokemonStats {
+  pokemon_aggregate {
+    aggregate {
+      count
+    }
+  }
+  type_aggregate {
+    aggregate {
+      count
+    }
+  }
+  legendary: pokemon_aggregate(
+    where: { pokemonspecy: { is_legendary: { _eq: true } } }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}

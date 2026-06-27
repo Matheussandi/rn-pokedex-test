@@ -1,0 +1,21 @@
+query PokemonList($limit: Int!, $offset: Int!, $search: String!) {
+  pokemon(
+    limit: $limit
+    offset: $offset
+    where: { name: { _ilike: $search } }
+    order_by: { id: asc }
+  ) {
+    id
+    name
+    height
+    weight
+    pokemontypes {
+      type {
+        name
+      }
+    }
+    pokemonsprites {
+      sprites
+    }
+  }
+}
