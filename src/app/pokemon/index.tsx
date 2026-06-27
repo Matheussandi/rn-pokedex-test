@@ -2,8 +2,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
-import { usePokemonListModel } from "@/features/pokemon-list/pokemon-model";
-import { PokemonListView } from "@/features/pokemon-list/pokemon-view";
+import { usePokemonListModel } from "@/screens/pokemon-list/pokemon-model";
+import { PokemonListView } from "@/screens/pokemon-list/pokemon-view";
 
 export default function PokemonListScreen() {
   const modelData = usePokemonListModel();
