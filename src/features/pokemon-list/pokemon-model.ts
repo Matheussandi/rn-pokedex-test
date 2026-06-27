@@ -1,6 +1,8 @@
-import { useQuery } from "@apollo/client/react";
-import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useQuery } from "@apollo/client/react";
+
+import { useRouter } from "expo-router";
 
 import {
   PokemonListByTypeDocument,
@@ -8,8 +10,9 @@ import {
   PokemonListQuery,
   PokemonTypesDocument,
 } from "@/graphql/generated/graphql";
-import { mergeById } from "@/utils/array";
+
 import { useFavorites } from "@/lib/favorites";
+import { mergeById } from "@/utils/array";
 
 const PAGE_SIZE = 20;
 
@@ -77,7 +80,9 @@ export function usePokemonListModel() {
   const data = appliedType ? typedListData : listData;
   const loading = appliedType ? typedListLoading : listLoading;
   const error = appliedType ? typedListError : listError;
-  const networkStatus = appliedType ? typedListNetworkStatus : listNetworkStatus;
+  const networkStatus = appliedType
+    ? typedListNetworkStatus
+    : listNetworkStatus;
   const refetch = appliedType ? refetchTypedList : refetchList;
 
   const { data: typesData } = useQuery(PokemonTypesDocument);

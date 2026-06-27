@@ -1,5 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "expo-image";
 import {
   Pressable,
   ScrollView,
@@ -8,26 +6,32 @@ import {
   View
 } from "react-native";
 
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+import { Image } from "expo-image";
+
 import { ErrorState } from "@/components/error-state";
 import { Loading } from "@/components/loading";
+
+import { usePokemonDetailModel } from "./pokemon-model";
+
 import {
   formatHeight,
   formatPokemonTypes,
   formatWeight,
   formatYesNo,
 } from "@/utils/format";
+
 import {
   capitalizeName,
   formatPokemonId,
   getPokemonImageUrl,
   getPokemonSprite,
 } from "@/utils/pokemon-image";
-import { usePokemonDetailModel } from "./pokemon-model";
 
 type PokemonDetailViewProps = ReturnType<typeof usePokemonDetailModel>;
 
 export function PokemonDetailView(props: PokemonDetailViewProps) {
-
   const { 
     pokemon, 
     loading, 

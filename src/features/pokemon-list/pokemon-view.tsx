@@ -1,5 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "expo-image";
 import {
   ActivityIndicator,
   FlatList,
@@ -13,15 +11,22 @@ import {
   View,
 } from "react-native";
 
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+import { Image } from "expo-image";
+
 import { ErrorState } from "@/components/error-state";
 import { Loading } from "@/components/loading";
+
+import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
+
 import { formatHeight, formatPokemonTypes, formatWeight } from "@/utils/format";
+
 import {
   capitalizeName,
   getPokemonImageUrl,
   getPokemonSprite,
 } from "@/utils/pokemon-image";
-import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
 
 type PokemonListViewProps = ReturnType<typeof usePokemonListModel>;
 

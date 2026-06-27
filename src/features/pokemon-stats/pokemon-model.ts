@@ -1,5 +1,6 @@
-import { useQuery } from "@apollo/client/react";
 import { useMemo } from "react";
+
+import { useQuery } from "@apollo/client/react";
 
 import { PokemonStatsDocument } from "@/graphql/generated/graphql";
 

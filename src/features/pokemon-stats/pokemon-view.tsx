@@ -1,17 +1,19 @@
-import { ErrorState } from "@/components/error-state";
-import { Loading } from "@/components/loading";
-import { formatPercentage } from "@/utils/format";
 import {
   StyleSheet,
   Text,
   View
 } from "react-native";
+
+import { ErrorState } from "@/components/error-state";
+import { Loading } from "@/components/loading";
+
 import { usePokemonStatsModel } from "./pokemon-model";
+
+import { formatPercentage } from "@/utils/format";
 
 type PokemonStatsViewProps = ReturnType<typeof usePokemonStatsModel>;
 
 export function PokemonStatsView(props: PokemonStatsViewProps) {
-
   const { stats, loading, error, refetch } = props;
 
   if (loading) {
