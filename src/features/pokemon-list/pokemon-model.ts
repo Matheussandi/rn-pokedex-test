@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "@apollo/client/react";
 
@@ -31,27 +31,19 @@ export function usePokemonListModel() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
-  const searchVariable = useMemo(() => {
-    const trimmed = appliedSearch.trim();
-    return trimmed ? `%${trimmed}%` : "%";
-  }, [appliedSearch]);
+  const trimmedSearch = appliedSearch.trim();
+  const searchVariable = trimmedSearch ? `%${trimmedSearch}%` : "%";
 
-  const listVariables = useMemo(
-    () => ({
-      limit: PAGE_SIZE,
-      offset,
-      search: searchVariable,
-    }),
-    [offset, searchVariable],
-  );
+  const listVariables = {
+    limit: PAGE_SIZE,
+    offset,
+    search: searchVariable,
+  };
 
-  const typedListVariables = useMemo(
-    () => ({
-      ...listVariables,
-      type: appliedType ?? "",
-    }),
-    [listVariables, appliedType],
-  );
+  const typedListVariables = {
+    ...listVariables,
+    type: appliedType ?? "",
+  };
 
   const {
     data: listData,
@@ -92,15 +84,15 @@ export function usePokemonListModel() {
   const isLoadingMore = loading && offset > 0;
   const hasMore = (data?.pokemon.length ?? 0) === PAGE_SIZE;
 
-  const loadMore = useCallback(() => {
+  function loadMore() {
     if (loading || !hasMore) {
       return;
     }
 
     setOffset((current) => current + PAGE_SIZE);
-  }, [loading, hasMore]);
+  }
 
-  const refresh = useCallback(async () => {
+  async function refresh() {
     setIsRefreshing(true);
     setOffset(0);
 
@@ -114,35 +106,32 @@ export function usePokemonListModel() {
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetch, searchVariable, appliedType]);
+  }
 
-  const openDetail = useCallback(
-    (id: number) => {
-      router.push(`/pokemon/${id}`);
-    },
-    [router],
-  );
+  function openDetail(id: number) {
+    router.push(`/pokemon/${id}`);
+  }
 
-  const openFilterModal = useCallback(() => {
+  function openFilterModal() {
     setDraftSearch(appliedSearch);
     setDraftType(appliedType);
     setIsFilterModalVisible(true);
-  }, [appliedSearch, appliedType]);
+  }
 
-  const closeFilterModal = useCallback(() => {
+  function closeFilterModal() {
     setIsFilterModalVisible(false);
-  }, []);
+  }
 
-  const clearFilters = useCallback(() => {
+  function clearFilters() {
     setDraftSearch("");
     setDraftType(null);
-  }, []);
+  }
 
-  const applyFilters = useCallback(() => {
+  function applyFilters() {
     setAppliedSearch(draftSearch);
     setAppliedType(draftType);
     setIsFilterModalVisible(false);
-  }, [draftSearch, draftType]);
+  }
 
   useEffect(() => {
     setOffset(0);

@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { useQuery } from "@apollo/client/react";
 
 import { useLocalSearchParams } from "expo-router";
@@ -20,7 +18,7 @@ export function usePokemonDetailModel() {
     skip: Number.isNaN(pokemonId),
   });
 
-  const pokemon = useMemo(() => data?.pokemon[0] ?? null, [data]);
+  const pokemon = data?.pokemon[0] ?? null;
 
   return {
     pokemon,

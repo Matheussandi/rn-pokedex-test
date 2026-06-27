@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -37,12 +37,11 @@ export function useFavorites() {
       .finally(() => setIsReady(true));
   }, []);
 
-  const isFavorite = useCallback(
-    (id: number) => favoriteIds.includes(id),
-    [favoriteIds],
-  );
+  function isFavorite(id: number) {
+    return favoriteIds.includes(id);
+  }
 
-  const toggleFavorite = useCallback(async (id: number) => {
+  async function toggleFavorite(id: number) {
     setFavoriteIds((current) => {
       const next = current.includes(id)
         ? current.filter((favoriteId) => favoriteId !== id)
@@ -51,7 +50,7 @@ export function useFavorites() {
       void writeFavoriteIds(next);
       return next;
     });
-  }, []);
+  }
 
   return {
     favoriteIds,
