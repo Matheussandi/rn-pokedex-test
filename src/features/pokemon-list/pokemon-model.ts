@@ -8,6 +8,7 @@ import {
   PokemonListQuery,
   PokemonTypesDocument,
 } from "@/graphql/generated/graphql";
+import { mergeById } from "@/utils/array";
 import { useFavorites } from "@/lib/favorites";
 
 const PAGE_SIZE = 20;
@@ -135,13 +136,7 @@ export function usePokemonListModel() {
       return;
     }
 
-    setPokemons((current) => {
-      const existingIds = new Set(current.map((pokemon) => pokemon.id));
-      const newItems = data.pokemon.filter(
-        (pokemon) => !existingIds.has(pokemon.id),
-      );
-      return [...current, ...newItems];
-    });
+    setPokemons((current) => mergeById(current, data.pokemon));
   }, [data, offset]);
 
   return {

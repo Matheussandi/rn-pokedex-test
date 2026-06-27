@@ -1,5 +1,6 @@
 import { ErrorState } from "@/components/error-state";
 import { Loading } from "@/components/loading";
+import { formatPercentage } from "@/utils/format";
 import {
   StyleSheet,
   Text,
@@ -8,8 +9,6 @@ import {
 import { usePokemonStatsModel } from "./pokemon-model";
 
 type PokemonStatsViewProps = ReturnType<typeof usePokemonStatsModel>;
-
-
 
 export function PokemonStatsView(props: PokemonStatsViewProps) {
 
@@ -36,7 +35,7 @@ export function PokemonStatsView(props: PokemonStatsViewProps) {
       />
       <StatCard
         label="Taxa de lendários"
-        value={`${stats.legendaryRate.toFixed(1)}%`}
+        value={formatPercentage(stats.legendaryRate)}
         description={`${stats.legendary} lendários de ${stats.total}`}
       />
       <StatCard
@@ -73,13 +72,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    backgroundColor: "#F9FAFB",
-  },
   card: {
     padding: 20,
     borderRadius: 16,
@@ -101,26 +93,5 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: 14,
     color: "#9CA3AF",
-  },
-  helperText: {
-    marginTop: 8,
-    fontSize: 15,
-    color: "#6B7280",
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#E3350D",
-  },
-  retryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
   },
 });

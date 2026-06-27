@@ -11,16 +11,21 @@ import {
 import { ErrorState } from "@/components/error-state";
 import { Loading } from "@/components/loading";
 import {
+  formatHeight,
+  formatPokemonTypes,
+  formatWeight,
+  formatYesNo,
+} from "@/utils/format";
+import {
   capitalizeName,
   formatPokemonId,
   getPokemonImageUrl,
-} from "@/lib/pokemon-image";
+  getPokemonSprite,
+} from "@/utils/pokemon-image";
 import { usePokemonDetailModel } from "./pokemon-model";
 
 type PokemonDetailViewProps = ReturnType<typeof usePokemonDetailModel>;
 
-
-1
 export function PokemonDetailView(props: PokemonDetailViewProps) {
 
   const { 
@@ -44,13 +49,8 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
     />;
   }
 
-  const types = pokemon.pokemontypes
-    .map((entry) => entry.type?.name)
-    .filter(Boolean)
-    .map((name) => capitalizeName(name!))
-    .join(", ");
-
-  const sprite = pokemon.pokemonsprites[0]?.sprites;
+  const types = formatPokemonTypes(pokemon.pokemontypes, { capitalize: true });
+  const sprite = getPokemonSprite(pokemon.pokemonsprites);
 
   return (
     <ScrollView
@@ -59,13 +59,13 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
     >
       <View style={styles.header}>
         <Image
-          source={{ uri: getPokemonImageUrl(pokemon.id, sprite as never) }}
+          source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
           style={styles.sprite}
           contentFit="contain"
         />
         <Text style={styles.id}>{formatPokemonId(pokemon.id)}</Text>
         <Text style={styles.name}>{capitalizeName(pokemon.name)}</Text>
-        <Text style={styles.types}>{types || "Sem tipo"}</Text>
+        <Text style={styles.types}>{types}</Text>
         <Pressable
           style={[styles.favoriteButton, isFavorite && styles.favoriteActive]}
           onPress={toggleFavorite}
@@ -82,17 +82,14 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
       </View>
 
       <Section title="Informações">
-        <InfoRow label="Altura" value={`${pokemon.height ?? 0} dm`} />
-        <InfoRow label="Peso" value={`${pokemon.weight ?? 0} hg`} />
+        <InfoRow label="Altura" value={formatHeight(pokemon.height)} />
+        <InfoRow label="Peso" value={formatWeight(pokemon.weight)} />
         <InfoRow
           label="Experiência base"
           value={String(pokemon.base_experience ?? "-")}
         />
         <InfoRow label="Ordem" value={String(pokemon.order ?? "-")} />
-        <InfoRow
-          label="Padrão"
-          value={pokemon.is_default ? "Sim" : "Não"}
-        />
+        <InfoRow label="Padrão" value={formatYesNo(pokemon.is_default)} />
       </Section>
 
       <Section title="Stats base">
@@ -123,11 +120,11 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
           />
           <InfoRow
             label="Lendário"
-            value={pokemon.pokemonspecy.is_legendary ? "Sim" : "Não"}
+            value={formatYesNo(pokemon.pokemonspecy.is_legendary)}
           />
           <InfoRow
             label="Mítico"
-            value={pokemon.pokemonspecy.is_mythical ? "Sim" : "Não"}
+            value={formatYesNo(pokemon.pokemonspecy.is_mythical)}
           />
         </Section>
       ) : null}
@@ -167,13 +164,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     gap: 16,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-    backgroundColor: "#F9FAFB",
   },
   header: {
     alignItems: "center",
@@ -251,27 +241,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: "#111827",
-  },
-  helperText: {
-    marginTop: 8,
-    fontSize: 15,
-    color: "#6B7280",
-    textAlign: "center",
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#E3350D",
-  },
-  retryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
   },
 });

@@ -14,10 +14,12 @@ import {
 
 import { ErrorState } from "@/components/error-state";
 import { Loading } from "@/components/loading";
+import { formatHeight, formatPokemonTypes, formatWeight } from "@/utils/format";
 import {
   capitalizeName,
   getPokemonImageUrl,
-} from "@/lib/pokemon-image";
+  getPokemonSprite,
+} from "@/utils/pokemon-image";
 import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
 
 type PokemonListViewProps = ReturnType<typeof usePokemonListModel>;
@@ -156,24 +158,20 @@ function PokemonListCard({
   onOpen: () => void;
   onToggleFavorite: () => void;
 }) {
-  const types = pokemon.pokemontypes
-    .map((entry) => entry.type?.name)
-    .filter(Boolean)
-    .join(", ");
-
-  const sprite = pokemon.pokemonsprites[0]?.sprites;
+  const types = formatPokemonTypes(pokemon.pokemontypes);
+  const sprite = getPokemonSprite(pokemon.pokemonsprites);
 
   return (
     <Pressable style={styles.card} onPress={onOpen}>
       <Image
-        source={{ uri: getPokemonImageUrl(pokemon.id, sprite as never) }}
+        source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
         style={styles.sprite}
         contentFit="contain"
       />
       <View style={styles.cardContent}>
         <Text style={styles.pokemonName}>{capitalizeName(pokemon.name)}</Text>
         <Text style={styles.pokemonMeta}>
-          {types || "Sem tipo"} · {pokemon.height ?? 0}dm · {pokemon.weight ?? 0}hg
+          {types} · {formatHeight(pokemon.height)} · {formatWeight(pokemon.weight)}
         </Text>
       </View>
       <Pressable onPress={onToggleFavorite} hitSlop={8}>
@@ -280,21 +278,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#6B7280",
     textAlign: "center",
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#E3350D",
-  },
-  retryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
   },
 });

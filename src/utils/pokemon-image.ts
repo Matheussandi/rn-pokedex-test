@@ -1,4 +1,4 @@
-type SpritesJson = {
+export type SpritesJson = {
   other?: {
     "official-artwork"?: {
       front_default?: string | null;
@@ -26,4 +26,10 @@ export function capitalizeName(name: string): string {
 
 export function formatPokemonId(id: number): string {
   return `#${String(id).padStart(3, "0")}`;
+}
+
+export function getPokemonSprite(
+  pokemonsprites: Array<{ sprites: unknown }>,
+): SpritesJson | null {
+  return (pokemonsprites[0]?.sprites as SpritesJson | undefined) ?? null;
 }
