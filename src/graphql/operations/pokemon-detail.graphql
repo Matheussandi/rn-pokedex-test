@@ -1,0 +1,37 @@
+query PokemonDetail($id: Int!) {
+  pokemon(where: { id: { _eq: $id } }) {
+    id
+    name
+    height
+    weight
+    base_experience
+    order
+    is_default
+    pokemontypes {
+      type {
+        name
+      }
+    }
+    pokemonabilities {
+      ability {
+        name
+      }
+      is_hidden
+    }
+    pokemonstats {
+      base_stat
+      effort
+      stat {
+        name
+      }
+    }
+    pokemonspecy {
+      capture_rate
+      is_legendary
+      is_mythical
+    }
+    pokemonsprites {
+      sprites
+    }
+  }
+}

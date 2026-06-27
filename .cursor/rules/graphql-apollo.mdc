@@ -1,0 +1,35 @@
+---
+description: Convenções GraphQL e Apollo Client
+globs: src/graphql/**/*
+alwaysApply: false
+---
+
+# GraphQL + Apollo
+
+## Queries
+
+- Definir em `src/graphql/operations/*.graphql`
+- Nunca usar strings GraphQL inline no código
+- Após alterar operations, rodar `yarn codegen`
+
+## Uso no código
+
+```ts
+import { useQuery } from "@apollo/client/react";
+import { PokemonListDocument } from "@/graphql/generated/graphql";
+
+const { data, loading, error, refetch } = useQuery(PokemonListDocument, {
+  variables: { ... },
+});
+```
+
+## Client
+
+- Configurado em `src/graphql/client.ts`
+- `fetchPolicy: cache-first` por padrão
+- Provider no `src/app/_layout.tsx`
+
+## Generated
+
+- Não editar arquivos em `src/graphql/generated/`
+- Importar tipos e documents de `@/graphql/generated/graphql`

@@ -1,0 +1,29 @@
+query PokemonListByType(
+  $limit: Int!
+  $offset: Int!
+  $search: String!
+  $type: String!
+) {
+  pokemon(
+    limit: $limit
+    offset: $offset
+    where: {
+      name: { _ilike: $search }
+      pokemontypes: { type: { name: { _eq: $type } } }
+    }
+    order_by: { id: asc }
+  ) {
+    id
+    name
+    height
+    weight
+    pokemontypes {
+      type {
+        name
+      }
+    }
+    pokemonsprites {
+      sprites
+    }
+  }
+}

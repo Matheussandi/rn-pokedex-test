@@ -1,0 +1,32 @@
+---
+description: Padrão MVVM para features do projeto
+globs: src/features/**/*
+alwaysApply: false
+---
+
+# MVVM por feature
+
+Cada feature em `src/features/<nome>/` deve ter exatamente:
+
+```
+pokemon-model.ts   # ViewModel: hooks, estado, queries Apollo, ações
+pokemon-view.tsx   # UI pura: recebe props, sem fetch direto
+index.tsx          # Glue: conecta model → view
+```
+
+## Regras
+
+- Model exporta hook `useXxxModel()` com estado e callbacks
+- View recebe tudo via props tipadas
+- `index.tsx` é o único export default da feature
+- Rotas em `src/app/` apenas re-exportam: `export { default } from "@/features/..."`
+
+## Exemplo
+
+```tsx
+// index.tsx
+export default function PokemonListScreen() {
+  const model = usePokemonListModel();
+  return <PokemonListView {...modelProps} />;
+}
+```
