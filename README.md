@@ -38,6 +38,15 @@ Escaneie o QR code com o Expo Go ou pressione `i` / `a` para abrir no simulador,
 | `yarn codegen` | Gera tipos e hooks Apollo a partir das queries GraphQL |
 | `yarn codegen:watch` | Codegen em modo watch |
 | `yarn lint` | Executa o linter |
+| `yarn test` | Roda todos os testes |
+| `yarn test:watch` | Roda testes em modo watch |
+
+## Testes
+
+```bash
+yarn test          # roda todos os testes
+yarn test:watch    # modo watch
+```
 
 ## API utilizada
 
