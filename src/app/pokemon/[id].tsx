@@ -20,7 +20,12 @@ export default function PokemonDetailScreen() {
     if (loading || error || !pokemon) {
       navigation.setOptions({
         title: "Detalhe",
-        headerStyle: { backgroundColor: colors.white },
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: colors.white,
+          elevation: 0,
+          borderBottomWidth: 0,
+        },
         headerTintColor: colors.black,
         headerTitleStyle: {
           fontFamily: fontFamily.bold,
@@ -35,7 +40,12 @@ export default function PokemonDetailScreen() {
 
     navigation.setOptions({
       title: capitalizeName(pokemon.name),
-      headerStyle: { backgroundColor: typeColor },
+      headerShadowVisible: false,
+      headerStyle: {
+        backgroundColor: typeColor,
+        elevation: 0,
+        borderBottomWidth: 0,
+      },
       headerTintColor: colors.white,
       headerTitleStyle: {
         fontFamily: fontFamily.bold,

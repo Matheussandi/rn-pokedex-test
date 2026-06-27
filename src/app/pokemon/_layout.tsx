@@ -17,7 +17,11 @@ export default function PokemonLayout() {
       <Stack.Screen name="index" options={{ title: "Pokédex" }} />
       <Stack.Screen
         name="[id]"
-        options={{ title: "Detalhe", headerBackTitle: "Voltar" }}
+        options={{
+          title: "Detalhe",
+          headerBackTitle: "Voltar",
+          headerShadowVisible: false,
+        }}
       />
     </Stack>
   );

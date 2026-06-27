@@ -20,7 +20,7 @@ import {
   type DetailTab,
 } from "@/components/ui";
 import { getPrimaryTypeColor } from "@/lib/color-utils";
-import { colors, POKEMON_SUMMARY_HEIGHT } from "@/lib/theme";
+import { colors } from "@/lib/theme";
 
 import type { usePokemonDetailModel } from "./pokemon-model";
 
@@ -66,45 +66,40 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: typeColor }]}>
-      <View style={styles.summary}>
-        <View style={styles.summaryHeader}>
-          <AppText variant="title" color="white">
-            {capitalizeName(pokemon.name)}
-          </AppText>
-          <AppText variant="body2" color="white" bold>
-            {formatPokemonId(pokemon.id)}
-          </AppText>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.summary}>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryTypes}>
+              <PokemonTypes types={pokemon.pokemontypes} size="regular" />
+            </View>
+            <AppText variant="body2" color="white" bold style={styles.summaryId}>
+              {formatPokemonId(pokemon.id)}
+            </AppText>
+          </View>
+
+          <Image
+            source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
+            style={styles.sprite}
+            contentFit="contain"
+          />
         </View>
 
-        <View style={styles.summaryMeta}>
-          <PokemonTypes types={pokemon.pokemontypes} size="regular" />
+        <View style={styles.detailsPanel}>
+          <DetailTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            tabWidth={tabWidth}
+          />
+
+          <View style={styles.tabContent}>
+            {activeTab === "about" ? (
+              <AboutTab pokemon={pokemon} flavorText={flavorText} />
+            ) : (
+              <StatsTab stats={pokemon.pokemonstats} />
+            )}
+          </View>
         </View>
-
-        <Image
-          source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
-          style={styles.sprite}
-          contentFit="contain"
-        />
-      </View>
-
-      <View style={styles.detailsPanel}>
-        <DetailTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          tabWidth={tabWidth}
-        />
-
-        <ScrollView
-          contentContainerStyle={styles.tabContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {activeTab === "about" ? (
-            <AboutTab pokemon={pokemon} flavorText={flavorText} />
-          ) : (
-            <StatsTab stats={pokemon.pokemonstats} />
-          )}
-        </ScrollView>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -234,21 +229,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summary: {
-    height: POKEMON_SUMMARY_HEIGHT,
     paddingHorizontal: 24,
     paddingBottom: 16,
-    overflow: "hidden",
   },
-  summaryHeader: {
+  summaryRow: {
     width: "100%",
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     marginTop: 4,
   },
-  summaryMeta: {
-    width: "100%",
-    marginTop: 12,
+  summaryTypes: {
+    flex: 1,
+    marginRight: 8,
+  },
+  summaryId: {
+    flexShrink: 0,
   },
   sprite: {
     width: 256,
@@ -257,7 +253,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   detailsPanel: {
-    flex: 1,
     backgroundColor: colors.white,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
