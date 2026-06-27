@@ -1,27 +1,35 @@
+import { useState } from "react";
+
 import {
-  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
-  View
+  useWindowDimensions,
+  View,
 } from "react-native";
-
-import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Image } from "expo-image";
 
-import { ErrorState } from "@/components/error-state";
-import { Loading } from "@/components/loading";
+import {
+  AppText,
+  DetailTabs,
+  ErrorState,
+  Loading,
+  PokemonTypes,
+  ShadowContainer,
+  StatBar,
+  type DetailTab,
+} from "@/components/ui";
+import { getPrimaryTypeColor } from "@/lib/color-utils";
+import { colors, POKEMON_SUMMARY_HEIGHT } from "@/lib/theme";
 
-import { usePokemonDetailModel } from "./pokemon-model";
+import type { usePokemonDetailModel } from "./pokemon-model";
 
 import {
   formatHeight,
-  formatPokemonTypes,
   formatWeight,
   formatYesNo,
 } from "@/utils/format";
-
+import { getPokemonFlavorText } from "@/utils/flavor-text";
 import {
   capitalizeName,
   formatPokemonId,
@@ -32,81 +40,132 @@ import {
 type PokemonDetailViewProps = ReturnType<typeof usePokemonDetailModel>;
 
 export function PokemonDetailView(props: PokemonDetailViewProps) {
-  const { 
-    pokemon, 
-    loading, 
-    error, 
-    refetch, 
-    isFavorite, 
-    toggleFavorite 
-  } = props;
-  
+  const { pokemon, loading, error, refetch } = props;
+
+  const { width } = useWindowDimensions();
+  const [activeTab, setActiveTab] = useState<DetailTab>("about");
+  const tabWidth = (width - 48) / 2;
+
   if (loading) {
     return <Loading />;
   }
 
   if (error || !pokemon) {
-    return <ErrorState 
-      title="Erro ao carregar detalhes"
-      message="Não foi possível carregar os detalhes."
-      onRetry={() => void refetch()}
-    />;
+    return (
+      <ErrorState
+        title="Erro ao carregar detalhes"
+        message="Não foi possível carregar os detalhes."
+        onRetry={() => void refetch()}
+      />
+    );
   }
 
-  const types = formatPokemonTypes(pokemon.pokemontypes, { capitalize: true });
+  const typeColor = getPrimaryTypeColor(pokemon.pokemontypes);
   const sprite = getPokemonSprite(pokemon.pokemonsprites);
+  const flavorText = getPokemonFlavorText(pokemon.pokemonspecy);
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: typeColor }]}>
+      <View style={styles.summary}>
+        <View style={styles.summaryHeader}>
+          <AppText variant="title" color="white">
+            {capitalizeName(pokemon.name)}
+          </AppText>
+          <AppText variant="body2" color="white" bold>
+            {formatPokemonId(pokemon.id)}
+          </AppText>
+        </View>
+
+        <View style={styles.summaryMeta}>
+          <PokemonTypes types={pokemon.pokemontypes} size="regular" />
+        </View>
+
         <Image
           source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
           style={styles.sprite}
           contentFit="contain"
         />
-        <Text style={styles.id}>{formatPokemonId(pokemon.id)}</Text>
-        <Text style={styles.name}>{capitalizeName(pokemon.name)}</Text>
-        <Text style={styles.types}>{types}</Text>
-        <Pressable
-          style={[styles.favoriteButton, isFavorite && styles.favoriteActive]}
-          onPress={toggleFavorite}
-        >
-          <Ionicons
-            name={isFavorite ? "star" : "star-outline"}
-            size={18}
-            color="#92400E"
-          />
-          <Text style={styles.favoriteButtonText}>
-            {isFavorite ? "Favorito" : "Adicionar aos favoritos"}
-          </Text>
-        </Pressable>
       </View>
 
-      <Section title="Informações">
-        <InfoRow label="Altura" value={formatHeight(pokemon.height)} />
-        <InfoRow label="Peso" value={formatWeight(pokemon.weight)} />
+      <View style={styles.detailsPanel}>
+        <DetailTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          tabWidth={tabWidth}
+        />
+
+        <ScrollView
+          contentContainerStyle={styles.tabContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {activeTab === "about" ? (
+            <AboutTab pokemon={pokemon} flavorText={flavorText} />
+          ) : (
+            <StatsTab stats={pokemon.pokemonstats} />
+          )}
+        </ScrollView>
+      </View>
+    </View>
+  );
+}
+
+type DetailPokemon = NonNullable<
+  ReturnType<typeof usePokemonDetailModel>["pokemon"]
+>;
+
+function AboutTab({
+  pokemon,
+  flavorText,
+}: {
+  pokemon: DetailPokemon;
+  flavorText: string | null;
+}) {
+  return (
+    <View style={styles.aboutContent}>
+      {flavorText ? (
+        <View style={styles.section}>
+          <AppText variant="body1" bold style={styles.sectionTitle}>
+            Descrição
+          </AppText>
+          <AppText variant="body3" style={styles.description}>
+            {flavorText}
+          </AppText>
+        </View>
+      ) : null}
+
+      <View style={styles.metricsRow}>
+        <ShadowContainer style={styles.metricCard}>
+          <AppText variant="body3" color="grey">
+            Altura
+          </AppText>
+          <AppText variant="body1" bold>
+            {formatHeight(pokemon.height)}
+          </AppText>
+        </ShadowContainer>
+        <ShadowContainer style={styles.metricCard}>
+          <AppText variant="body3" color="grey">
+            Peso
+          </AppText>
+          <AppText variant="body1" bold>
+            {formatWeight(pokemon.weight)}
+          </AppText>
+        </ShadowContainer>
+      </View>
+
+      <View style={styles.section}>
+        <AppText variant="body1" bold style={styles.sectionTitle}>
+          Treinamento
+        </AppText>
         <InfoRow
           label="Experiência base"
           value={String(pokemon.base_experience ?? "-")}
         />
-        <InfoRow label="Ordem" value={String(pokemon.order ?? "-")} />
-        <InfoRow label="Padrão" value={formatYesNo(pokemon.is_default)} />
-      </Section>
+      </View>
 
-      <Section title="Stats base">
-        {pokemon.pokemonstats.map((stat) => (
-          <InfoRow
-            key={stat.stat?.name ?? stat.base_stat}
-            label={capitalizeName(stat.stat?.name ?? "stat")}
-            value={String(stat.base_stat)}
-          />
-        ))}
-      </Section>
-
-      <Section title="Habilidades">
+      <View style={styles.section}>
+        <AppText variant="body1" bold style={styles.sectionTitle}>
+          Habilidades
+        </AppText>
         {pokemon.pokemonabilities.map((entry) => (
           <InfoRow
             key={`${entry.ability?.name}-${entry.is_hidden}`}
@@ -114,10 +173,13 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
             value={entry.is_hidden ? "Oculta" : "Normal"}
           />
         ))}
-      </Section>
+      </View>
 
       {pokemon.pokemonspecy ? (
-        <Section title="Espécie">
+        <View style={styles.section}>
+          <AppText variant="body1" bold style={styles.sectionTitle}>
+            Espécie
+          </AppText>
           <InfoRow
             label="Taxa de captura"
             value={String(pokemon.pokemonspecy.capture_rate ?? "-")}
@@ -130,23 +192,26 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
             label="Mítico"
             value={formatYesNo(pokemon.pokemonspecy.is_mythical)}
           />
-        </Section>
+        </View>
       ) : null}
-    </ScrollView>
+    </View>
   );
 }
 
-function Section({
-  title,
-  children,
+function StatsTab({
+  stats,
 }: {
-  title: string;
-  children: React.ReactNode;
+  stats: DetailPokemon["pokemonstats"];
 }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionCard}>{children}</View>
+    <View>
+      {stats.map((stat) => (
+        <StatBar
+          key={stat.stat?.name ?? stat.base_stat}
+          label={stat.stat?.name ?? "stat"}
+          value={stat.base_stat}
+        />
+      ))}
     </View>
   );
 }
@@ -154,8 +219,12 @@ function Section({
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
+      <AppText variant="body3" color="grey" style={styles.infoLabel}>
+        {label}
+      </AppText>
+      <AppText variant="body3" bold style={styles.infoValue}>
+        {value}
+      </AppText>
     </View>
   );
 }
@@ -163,87 +232,72 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
   },
-  content: {
-    padding: 16,
-    gap: 16,
+  summary: {
+    height: POKEMON_SUMMARY_HEIGHT,
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+    overflow: "hidden",
   },
-  header: {
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    gap: 8,
+  summaryHeader: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    marginTop: 4,
+  },
+  summaryMeta: {
+    width: "100%",
+    marginTop: 12,
   },
   sprite: {
-    width: 160,
-    height: 160,
+    width: 256,
+    height: 256,
+    alignSelf: "center",
+    marginTop: 16,
   },
-  id: {
-    fontSize: 14,
-    color: "#6B7280",
-    fontWeight: "600",
+  detailsPanel: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    paddingTop: 16,
   },
-  name: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111827",
+  tabContent: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
   },
-  types: {
-    fontSize: 16,
-    color: "#6B7280",
-  },
-  favoriteButton: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: "#F3F4F6",
-  },
-  favoriteActive: {
-    backgroundColor: "#FEF3C7",
-  },
-  favoriteButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#92400E",
+  aboutContent: {
+    gap: 32,
   },
   section: {
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
+    marginBottom: 8,
   },
-  sectionCard: {
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    overflow: "hidden",
+  description: {
+    marginTop: 8,
+  },
+  metricsRow: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  metricCard: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    minHeight: 100,
   },
   infoRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    alignItems: "center",
+    marginTop: 16,
   },
   infoLabel: {
-    fontSize: 15,
-    color: "#374151",
+    width: 100,
   },
   infoValue: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111827",
+    flex: 1,
   },
 });

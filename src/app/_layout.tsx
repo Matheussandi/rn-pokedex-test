@@ -1,17 +1,46 @@
 import { ApolloProvider } from "@apollo/client/react";
-
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_700Bold,
+  useFonts,
+} from "@expo-google-fonts/inter";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
 import { apolloClient } from "@/graphql/client";
+import { colors, fontFamily } from "@/lib/theme";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ApolloProvider client={apolloClient}>
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: "#FFFFFF" },
-          headerTitleStyle: { fontWeight: "600", color: "#111827" },
-          headerTintColor: "#111827",
+          headerStyle: { backgroundColor: colors.white },
+          headerTitleStyle: {
+            fontFamily: fontFamily.bold,
+            color: colors.black,
+          },
+          headerTintColor: colors.black,
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />

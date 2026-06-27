@@ -1,3 +1,5 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StatusBar } from "expo-status-bar";
 import {
   ActivityIndicator,
   FlatList,
@@ -6,24 +8,28 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from "react-native";
 
-import Ionicons from "@expo/vector-icons/Ionicons";
-
 import { Image } from "expo-image";
 
-import { ErrorState } from "@/components/error-state";
-import { Loading } from "@/components/loading";
+import {
+  AppText,
+  Chip,
+  ErrorState,
+  Input,
+  Loading,
+  Pokeball,
+  PokemonTypes,
+} from "@/components/ui";
+import { getPrimaryTypeColor, getThemeColorWithOpacity } from "@/lib/color-utils";
+import { CARD_HEIGHT, colors } from "@/lib/theme";
 
 import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
 
-import { formatHeight, formatPokemonTypes, formatWeight } from "@/utils/format";
-
 import {
   capitalizeName,
+  formatPokemonId,
   getPokemonImageUrl,
   getPokemonSprite,
 } from "@/utils/pokemon-image";
@@ -48,8 +54,6 @@ export function PokemonListView(props: PokemonListViewProps) {
     refresh,
     refetch,
     openDetail,
-    isFavorite,
-    toggleFavorite,
     isFilterModalVisible,
     closeFilterModal,
   } = props;
@@ -70,6 +74,8 @@ export function PokemonListView(props: PokemonListViewProps) {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
+
       <Modal
         visible={isFilterModalVisible}
         statusBarTranslucent
@@ -78,36 +84,38 @@ export function PokemonListView(props: PokemonListViewProps) {
         onRequestClose={closeFilterModal}
       >
         <Pressable style={styles.modalOverlay} onPress={closeFilterModal}>
-          <View style={styles.modalContent}>
+          <Pressable style={styles.modalContent} onPress={() => {}}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filtros</Text>
+              <AppText variant="body1" bold>
+                Filtros
+              </AppText>
               <Pressable onPress={closeFilterModal} hitSlop={8}>
-                <Ionicons name="close" size={24} color="#111827" />
+                <Ionicons name="close" size={24} color={colors.black} />
               </Pressable>
             </View>
 
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por nome..."
-              placeholderTextColor="#9CA3AF"
-              value={draftSearch}
-              onChangeText={setDraftSearch}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+            <View style={styles.modalInputRow}>
+              <Input
+                placeholder="Buscar por nome..."
+                value={draftSearch}
+                onChangeText={setDraftSearch}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
 
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.typeRow}
             >
-              <FilterChip
+              <Chip
                 label="Todos"
                 selected={draftType === null}
                 onPress={() => setDraftType(null)}
               />
               {types.map((type) => (
-                <FilterChip
+                <Chip
                   key={type.id}
                   label={capitalizeName(type.name)}
                   selected={draftType === type.name}
@@ -118,19 +126,25 @@ export function PokemonListView(props: PokemonListViewProps) {
 
             <View style={styles.modalActions}>
               <Pressable style={styles.clearButton} onPress={clearFilters}>
-                <Text style={styles.clearButtonText}>Limpar</Text>
+                <AppText variant="body3" bold>
+                  Limpar
+                </AppText>
               </Pressable>
               <Pressable style={styles.applyButton} onPress={applyFilters}>
-                <Text style={styles.applyButtonText}>Filtrar</Text>
+                <AppText variant="body3" color="white" bold>
+                  Filtrar
+                </AppText>
               </Pressable>
             </View>
-          </View>
+          </Pressable>
         </Pressable>
       </Modal>
 
       <FlatList
         data={pokemons}
         keyExtractor={(item) => String(item.id)}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={
           pokemons.length === 0 ? styles.emptyList : styles.listContent
         }
@@ -141,20 +155,23 @@ export function PokemonListView(props: PokemonListViewProps) {
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           <View style={styles.centered}>
-            <Text style={styles.helperText}>Nenhum Pokémon encontrado.</Text>
+            <AppText variant="body3" color="grey" style={styles.helperText}>
+              Nenhum Pokémon encontrado.
+            </AppText>
           </View>
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <ActivityIndicator style={styles.footerLoader} color="#E3350D" />
+            <ActivityIndicator
+              style={styles.footerLoader}
+              color={colors.lilac}
+            />
           ) : null
         }
         renderItem={({ item }) => (
           <PokemonListCard
             pokemon={item}
-            isFavorite={isFavorite(item.id)}
             onOpen={() => openDetail(item.id)}
-            onToggleFavorite={() => toggleFavorite(item.id)}
           />
         )}
       />
@@ -162,61 +179,42 @@ export function PokemonListView(props: PokemonListViewProps) {
   );
 }
 
-function FilterChip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      style={[styles.chip, selected && styles.chipSelected]}
-      onPress={onPress}
-    >
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
-
 function PokemonListCard({
   pokemon,
-  isFavorite,
   onOpen,
-  onToggleFavorite,
 }: {
   pokemon: PokemonListItem;
-  isFavorite: boolean;
   onOpen: () => void;
-  onToggleFavorite: () => void;
 }) {
-  const types = formatPokemonTypes(pokemon.pokemontypes);
   const sprite = getPokemonSprite(pokemon.pokemonsprites);
+  const backgroundColor = getPrimaryTypeColor(pokemon.pokemontypes);
 
   return (
-    <Pressable style={styles.card} onPress={onOpen}>
+    <Pressable
+      style={[styles.card, { backgroundColor }]}
+      onPress={onOpen}
+    >
+      <AppText variant="caption" style={styles.cardId}>
+        {formatPokemonId(pokemon.id)}
+      </AppText>
+
+      <AppText variant="body3" color="white" bold numberOfLines={1}>
+        {capitalizeName(pokemon.name)}
+      </AppText>
+
+      <PokemonTypes types={pokemon.pokemontypes} size="small" />
+
       <Image
         source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
         style={styles.sprite}
         contentFit="contain"
       />
-      <View style={styles.cardContent}>
-        <Text style={styles.pokemonName}>{capitalizeName(pokemon.name)}</Text>
-        <Text style={styles.pokemonMeta}>
-          {types} · {formatHeight(pokemon.height)} · {formatWeight(pokemon.weight)}
-        </Text>
-      </View>
-      <Pressable onPress={onToggleFavorite} hitSlop={8}>
-        <Ionicons
-          name={isFavorite ? "star" : "star-outline"}
-          size={22}
-          color="#F59E0B"
-        />
-      </Pressable>
+
+      <Pokeball
+        width={80}
+        height={80}
+        style={styles.pokeball}
+      />
     </Pressable>
   );
 }
@@ -224,17 +222,17 @@ function PokemonListCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: colors.white,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: getThemeColorWithOpacity("black", "60"),
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "#F9FAFB",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     paddingTop: 16,
     paddingBottom: 24,
   },
@@ -242,128 +240,89 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
     paddingBottom: 16,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#111827",
+  modalInputRow: {
+    paddingHorizontal: 24,
+    marginBottom: 8,
   },
   centered: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#F9FAFB",
-  },
-  searchInput: {
-    marginHorizontal: 16,
-    marginBottom: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    fontSize: 16,
-    color: "#111827",
   },
   typeRow: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
     paddingBottom: 16,
     gap: 8,
   },
   modalActions: {
     gap: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 24,
   },
   clearButton: {
     paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderRadius: 24,
+    backgroundColor: colors.semiGrey,
     alignItems: "center",
-  },
-  clearButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#374151",
   },
   applyButton: {
     paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: "#E3350D",
+    borderRadius: 24,
+    backgroundColor: colors.lilac,
     alignItems: "center",
   },
-  applyButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFFFFF",
-  },
-  chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  chipSelected: {
-    backgroundColor: "#E3350D",
-    borderColor: "#E3350D",
-  },
-  chipText: {
-    color: "#374151",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  chipTextSelected: {
-    color: "#FFFFFF",
-  },
   listContent: {
-    padding: 16,
-    gap: 12,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
   },
   emptyList: {
     flexGrow: 1,
-    padding: 16,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+  },
+  columnWrapper: {
+    gap: 10,
+    marginBottom: 10,
   },
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    gap: 12,
+    flex: 1,
+    height: CARD_HEIGHT,
+    padding: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  cardId: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    fontSize: 10,
+    color: getThemeColorWithOpacity("black", "30"),
   },
   sprite: {
-    width: 56,
-    height: 56,
+    position: "absolute",
+    right: 4,
+    bottom: 4,
+    width: 72,
+    height: 72,
   },
-  cardContent: {
-    flex: 1,
-    gap: 4,
-  },
-  pokemonName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  pokemonMeta: {
-    fontSize: 13,
-    color: "#6B7280",
+  pokeball: {
+    position: "absolute",
+    right: -8,
+    bottom: -8,
   },
   footerLoader: {
-    marginVertical: 16,
+    marginVertical: 8,
   },
   helperText: {
-    marginTop: 8,
-    fontSize: 15,
-    color: "#6B7280",
     textAlign: "center",
   },
 });

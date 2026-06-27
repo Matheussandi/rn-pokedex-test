@@ -4,8 +4,7 @@ import {
   View
 } from "react-native";
 
-import { ErrorState } from "@/components/error-state";
-import { Loading } from "@/components/loading";
+import { ErrorState, Loading } from "@/components/ui";
 
 import { usePokemonStatsModel } from "./pokemon-model";
 
