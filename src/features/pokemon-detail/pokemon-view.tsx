@@ -1,60 +1,47 @@
-import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
 import {
-  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 
-import type { PokemonDetailQuery } from "@/graphql/generated/graphql";
+import { ErrorState } from "@/components/error-state";
+import { Loading } from "@/components/loading";
 import {
   capitalizeName,
   formatPokemonId,
   getPokemonImageUrl,
 } from "@/lib/pokemon-image";
+import { usePokemonDetailModel } from "./pokemon-model";
 
-type Pokemon = NonNullable<PokemonDetailQuery["pokemon"][number]>;
+type PokemonDetailViewProps = ReturnType<typeof usePokemonDetailModel>;
 
-type PokemonDetailViewProps = {
-  pokemon: Pokemon | null;
-  loading: boolean;
-  error: Error | undefined;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-  onRetry: () => void;
-};
 
-export function PokemonDetailView({
-  pokemon,
-  loading,
-  error,
-  isFavorite,
-  onToggleFavorite,
-  onRetry,
-}: PokemonDetailViewProps) {
+1
+export function PokemonDetailView(props: PokemonDetailViewProps) {
+
+  const { 
+    pokemon, 
+    loading, 
+    error, 
+    refetch, 
+    isFavorite, 
+    toggleFavorite 
+  } = props;
+  
   if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#E3350D" />
-      </View>
-    );
+    return <Loading />;
   }
 
   if (error || !pokemon) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>Pokémon não encontrado</Text>
-        <Text style={styles.helperText}>
-          Não foi possível carregar os detalhes.
-        </Text>
-        <Pressable style={styles.retryButton} onPress={onRetry}>
-          <Text style={styles.retryButtonText}>Tentar novamente</Text>
-        </Pressable>
-      </View>
-    );
+    return <ErrorState 
+      title="Erro ao carregar detalhes"
+      message="Não foi possível carregar os detalhes."
+      onRetry={() => void refetch()}
+    />;
   }
 
   const types = pokemon.pokemontypes
@@ -81,7 +68,7 @@ export function PokemonDetailView({
         <Text style={styles.types}>{types || "Sem tipo"}</Text>
         <Pressable
           style={[styles.favoriteButton, isFavorite && styles.favoriteActive]}
-          onPress={onToggleFavorite}
+          onPress={toggleFavorite}
         >
           <Ionicons
             name={isFavorite ? "star" : "star-outline"}

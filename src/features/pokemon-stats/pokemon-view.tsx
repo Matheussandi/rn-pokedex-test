@@ -1,52 +1,30 @@
+import { ErrorState } from "@/components/error-state";
+import { Loading } from "@/components/loading";
 import {
-  ActivityIndicator,
-  Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
+import { usePokemonStatsModel } from "./pokemon-model";
 
-type Stats = {
-  total: number;
-  legendary: number;
-  typesCount: number;
-  legendaryRate: number;
-};
+type PokemonStatsViewProps = ReturnType<typeof usePokemonStatsModel>;
 
-type PokemonStatsViewProps = {
-  stats: Stats;
-  loading: boolean;
-  error: Error | undefined;
-  onRetry: () => void;
-};
 
-export function PokemonStatsView({
-  stats,
-  loading,
-  error,
-  onRetry,
-}: PokemonStatsViewProps) {
+
+export function PokemonStatsView(props: PokemonStatsViewProps) {
+
+  const { stats, loading, error, refetch } = props;
+
   if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#E3350D" />
-        <Text style={styles.helperText}>Carregando estatísticas...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>Erro ao carregar stats</Text>
-        <Text style={styles.helperText}>
-          Não foi possível buscar os dados agregados.
-        </Text>
-        <Pressable style={styles.retryButton} onPress={onRetry}>
-          <Text style={styles.retryButtonText}>Tentar novamente</Text>
-        </Pressable>
-      </View>
-    );
+    return <ErrorState 
+    title="Erro ao carregar stats"
+    message="Não foi possível buscar os dados agregados."
+    onRetry={refetch}
+    />
   }
 
   return (

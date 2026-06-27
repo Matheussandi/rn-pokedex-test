@@ -1,5 +1,5 @@
-import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image } from "expo-image";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,70 +12,48 @@ import {
   View,
 } from "react-native";
 
-import type { PokemonListItem } from "./pokemon-model";
+import { ErrorState } from "@/components/error-state";
+import { Loading } from "@/components/loading";
 import {
   capitalizeName,
   getPokemonImageUrl,
 } from "@/lib/pokemon-image";
+import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
 
-type PokemonListViewProps = {
-  pokemons: PokemonListItem[];
-  types: Array<{ id: number; name: string }>;
-  searchText: string;
-  selectedType: string | null;
-  isInitialLoading: boolean;
-  isLoadingMore: boolean;
-  isRefreshing: boolean;
-  error: Error | undefined;
-  onSearchChange: (text: string) => void;
-  onTypeChange: (type: string | null) => void;
-  onLoadMore: () => void;
-  onRefresh: () => void;
-  onRetry: () => void;
-  onOpenDetail: (id: number) => void;
-  isFavorite: (id: number) => boolean;
-  onToggleFavorite: (id: number) => void;
-};
+type PokemonListViewProps = ReturnType<typeof usePokemonListModel>;
 
-export function PokemonListView({
-  pokemons,
-  types,
-  searchText,
-  selectedType,
-  isInitialLoading,
-  isLoadingMore,
-  isRefreshing,
-  error,
-  onSearchChange,
-  onTypeChange,
-  onLoadMore,
-  onRefresh,
-  onRetry,
-  onOpenDetail,
-  isFavorite,
-  onToggleFavorite,
-}: PokemonListViewProps) {
+export function PokemonListView(props: PokemonListViewProps) {
+  const {
+    pokemons,
+    types,
+    searchText,
+    selectedType,
+    isInitialLoading,
+    isLoadingMore,
+    isRefreshing,
+    error,
+    hasMore,
+    networkStatus,
+    setSearchText,
+    setSelectedType,
+    loadMore,
+    refresh,
+    refetch,
+    openDetail,
+    isFavorite,
+    toggleFavorite,
+  } = props;
+
   if (isInitialLoading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#E3350D" />
-        <Text style={styles.helperText}>Carregando Pokémon...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   if (error && pokemons.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorTitle}>Não foi possível carregar</Text>
-        <Text style={styles.helperText}>
-          A API pode estar lenta ou indisponível. Tente novamente.
-        </Text>
-        <Pressable style={styles.retryButton} onPress={onRetry}>
-          <Text style={styles.retryButtonText}>Tentar novamente</Text>
-        </Pressable>
-      </View>
-    );
+    return <ErrorState 
+    title="Erro ao carregar Pokémon"
+    message="A API pode estar lenta ou indisponível. Tente novamente."
+    onRetry={refetch}
+    />
   }
 
   return (
@@ -85,7 +63,9 @@ export function PokemonListView({
         placeholder="Buscar por nome..."
         placeholderTextColor="#9CA3AF"
         value={searchText}
-        onChangeText={onSearchChange}
+        onChangeText={
+          (text) => setSearchText(text)
+        }
         autoCapitalize="none"
         autoCorrect={false}
       />
@@ -98,14 +78,14 @@ export function PokemonListView({
         <FilterChip
           label="Todos"
           selected={selectedType === null}
-          onPress={() => onTypeChange(null)}
+          onPress={() => setSelectedType(null)}
         />
         {types.map((type) => (
           <FilterChip
             key={type.id}
             label={capitalizeName(type.name)}
             selected={selectedType === type.name}
-            onPress={() => onTypeChange(type.name)}
+            onPress={() => setSelectedType(type.name)}
           />
         ))}
       </ScrollView>
@@ -117,9 +97,9 @@ export function PokemonListView({
           pokemons.length === 0 ? styles.emptyList : styles.listContent
         }
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />
         }
-        onEndReached={onLoadMore}
+        onEndReached={loadMore}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           <View style={styles.centered}>
@@ -135,8 +115,8 @@ export function PokemonListView({
           <PokemonListCard
             pokemon={item}
             isFavorite={isFavorite(item.id)}
-            onOpen={() => onOpenDetail(item.id)}
-            onToggleFavorite={() => onToggleFavorite(item.id)}
+            onOpen={() => openDetail(item.id)}
+            onToggleFavorite={() => toggleFavorite(item.id)}
           />
         )}
       />
