@@ -50,7 +50,7 @@ export default function PokemonDetailScreen() {
       />
 
       <StatusBar style={isLoaded ? "light" : "dark"} />
-      
+
       <PokemonDetailView {...modelData} />
     </>
   );

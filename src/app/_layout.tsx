@@ -1,15 +1,21 @@
+import { useEffect } from "react";
+
 import { ApolloProvider } from "@apollo/client/react";
+
 import {
   Inter_400Regular,
   Inter_500Medium,
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
-import { Stack } from "expo-router";
+
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 import { apolloClient } from "@/graphql/client";
+
 import { colors, fontFamily } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -33,6 +39,7 @@ export default function RootLayout() {
 
   return (
     <ApolloProvider client={apolloClient}>
+      <StatusBar style="dark" />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: colors.white },

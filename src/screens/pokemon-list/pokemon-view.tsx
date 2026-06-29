@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { StatusBar } from "expo-status-bar";
 import {
   ActivityIndicator,
   FlatList,
@@ -74,8 +73,6 @@ export function PokemonListView(props: PokemonListViewProps) {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
-
       <Modal
         visible={isFilterModalVisible}
         statusBarTranslucent
