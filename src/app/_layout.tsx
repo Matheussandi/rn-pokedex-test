@@ -14,6 +14,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
+import { ToastProvider } from "@/components/ui";
 import { apolloClient } from "@/graphql/client";
 
 import { colors, fontFamily } from "@/lib/theme";
@@ -39,21 +40,23 @@ export default function RootLayout() {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.white },
-          headerTitleStyle: {
-            fontFamily: fontFamily.bold,
-            color: colors.black,
-          },
-          headerTintColor: colors.black,
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="pokemon" options={{ headerShown: false }} />
-        <Stack.Screen name="stats" options={{ title: "Stats" }} />
-      </Stack>
+      <ToastProvider>
+        <StatusBar style="dark" />
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.white },
+            headerTitleStyle: {
+              fontFamily: fontFamily.bold,
+              color: colors.black,
+            },
+            headerTintColor: colors.black,
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="pokemon" options={{ headerShown: false }} />
+          <Stack.Screen name="stats" options={{ title: "Stats" }} />
+        </Stack>
+      </ToastProvider>
     </ApolloProvider>
   );
 }

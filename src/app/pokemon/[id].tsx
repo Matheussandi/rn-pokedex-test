@@ -1,8 +1,7 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Pressable } from "react-native";
 
+import { FavoriteButton } from "@/components/ui";
 import { getPrimaryTypeColor } from "@/lib/color-utils";
 import { colors, fontFamily } from "@/lib/theme";
 import { usePokemonDetailModel } from "@/screens/pokemon-detail/pokemon-model";
@@ -33,17 +32,10 @@ export default function PokemonDetailScreen() {
           },
           headerRight: isLoaded
             ? () => (
-                <Pressable
-                  onPress={toggleFavorite}
-                  hitSlop={8}
-                  style={{ marginRight: 4 }}
-                >
-                  <Ionicons
-                    name={isFavorite ? "star" : "star-outline"}
-                    size={22}
-                    color={colors.white}
-                  />
-                </Pressable>
+                <FavoriteButton
+                  isFavorite={isFavorite}
+                  onToggle={toggleFavorite}
+                />
               )
             : undefined,
         }}

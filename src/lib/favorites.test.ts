@@ -87,4 +87,26 @@ describe("useFavorites", () => {
     expect(result.current?.isFavorite(7)).toBe(true);
     expect(result.current?.isFavorite(25)).toBe(true);
   });
+
+  it("reverte estado quando persistência falha", async () => {
+    const { result } = await renderHook(() => useFavorites());
+
+    await waitFor(() => {
+      expect(result.current?.isReady).toBe(true);
+    });
+
+    jest
+      .spyOn(AsyncStorage, "setItem")
+      .mockRejectedValueOnce(new Error("Storage unavailable"));
+
+    let success = true;
+
+    await act(async () => {
+      success = (await result.current?.toggleFavorite(25)) ?? false;
+    });
+
+    expect(success).toBe(false);
+    expect(result.current?.isFavorite(25)).toBe(false);
+    expect(result.current?.favoriteIds).toEqual([]);
+  });
 });

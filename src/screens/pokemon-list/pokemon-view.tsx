@@ -16,6 +16,7 @@ import {
   AppText,
   Chip,
   ErrorState,
+  FavoriteButton,
   Input,
   Loading,
   Pokeball,
@@ -53,6 +54,7 @@ export function PokemonListView(props: PokemonListViewProps) {
     refresh,
     refetch,
     openDetail,
+    isFavorite,
     isFilterModalVisible,
     closeFilterModal,
   } = props;
@@ -168,6 +170,7 @@ export function PokemonListView(props: PokemonListViewProps) {
         renderItem={({ item }) => (
           <PokemonListCard
             pokemon={item}
+            isFavorite={isFavorite(item.id)}
             onOpen={() => openDetail(item.id)}
           />
         )}
@@ -178,9 +181,11 @@ export function PokemonListView(props: PokemonListViewProps) {
 
 function PokemonListCard({
   pokemon,
+  isFavorite,
   onOpen,
 }: {
   pokemon: PokemonListItem;
+  isFavorite: boolean;
   onOpen: () => void;
 }) {
   const sprite = getPokemonSprite(pokemon.pokemonsprites);
@@ -191,15 +196,29 @@ function PokemonListCard({
       style={[styles.card, { backgroundColor }]}
       onPress={onOpen}
     >
+      <FavoriteButton
+        readonly
+        isFavorite={isFavorite}
+        size={14}
+        style={styles.favoriteIndicator}
+      />
+
+      <View style={styles.cardContent}>
+        <AppText
+          variant="body3"
+          color="white"
+          bold
+          numberOfLines={1}
+        >
+          {capitalizeName(pokemon.name)}
+        </AppText>
+
+        <PokemonTypes types={pokemon.pokemontypes} size="small" />
+      </View>
+
       <AppText variant="caption" style={styles.cardId}>
         {formatPokemonId(pokemon.id)}
       </AppText>
-
-      <AppText variant="body3" color="white" bold numberOfLines={1}>
-        {capitalizeName(pokemon.name)}
-      </AppText>
-
-      <PokemonTypes types={pokemon.pokemontypes} size="small" />
 
       <Image
         source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
@@ -299,10 +318,22 @@ const styles = StyleSheet.create({
   },
   cardId: {
     position: "absolute",
-    top: 10,
-    right: 10,
+    bottom: 10,
+    left: 10,
     fontSize: 10,
     color: getThemeColorWithOpacity("black", "30"),
+  },
+  cardContent: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    right: 28,
+    gap: 4,
+  },
+  favoriteIndicator: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
   sprite: {
     position: "absolute",

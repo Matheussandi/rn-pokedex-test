@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -18,22 +18,30 @@ async function readFavoriteIds(): Promise<number[]> {
   }
 }
 
-async function writeFavoriteIds(ids: number[]): Promise<void> {
+async function writeFavoriteIds(ids: number[]): Promise<boolean> {
   try {
     await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+    return true;
   } catch {
-    // Storage indisponível — favoritos ficam apenas em memória nesta sessão
+    return false;
   }
 }
 
 export function useFavorites() {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const favoriteIdsRef = useRef<number[]>([]);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     readFavoriteIds()
-      .then(setFavoriteIds)
-      .catch(() => setFavoriteIds([]))
+      .then((ids) => {
+        setFavoriteIds(ids);
+        favoriteIdsRef.current = ids;
+      })
+      .catch(() => {
+        setFavoriteIds([]);
+        favoriteIdsRef.current = [];
+      })
       .finally(() => setIsReady(true));
   }, []);
 
@@ -41,15 +49,24 @@ export function useFavorites() {
     return favoriteIds.includes(id);
   }
 
-  async function toggleFavorite(id: number) {
-    setFavoriteIds((current) => {
-      const next = current.includes(id)
-        ? current.filter((favoriteId) => favoriteId !== id)
-        : [...current, id];
+  async function toggleFavorite(id: number): Promise<boolean> {
+    const current = favoriteIdsRef.current;
+    const next = current.includes(id)
+      ? current.filter((favoriteId) => favoriteId !== id)
+      : [...current, id];
 
-      void writeFavoriteIds(next);
-      return next;
-    });
+    setFavoriteIds(next);
+    favoriteIdsRef.current = next;
+
+    const saved = await writeFavoriteIds(next);
+
+    if (!saved) {
+      setFavoriteIds(current);
+      favoriteIdsRef.current = current;
+      return false;
+    }
+
+    return true;
   }
 
   return {
