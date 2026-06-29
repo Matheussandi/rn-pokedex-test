@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ScrollView,
@@ -8,18 +8,26 @@ import {
 } from "react-native";
 
 import { Image } from "expo-image";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 import {
   AppText,
   DetailTabs,
   ErrorState,
   Loading,
+  Pokeball,
   PokemonTypes,
   ShadowContainer,
   StatBar,
   type DetailTab,
 } from "@/components/ui";
-import { getPrimaryTypeColor } from "@/lib/color-utils";
+import { getPrimaryTypeColor, withOpacity } from "@/lib/color-utils";
 import { colors } from "@/lib/theme";
 
 import type { usePokemonDetailModel } from "./pokemon-model";
@@ -77,11 +85,14 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
             </AppText>
           </View>
 
-          <Image
-            source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
-            style={styles.sprite}
-            contentFit="contain"
-          />
+          <View style={styles.spriteWrap}>
+            <SpinningPokeball />
+            <Image
+              source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
+              style={styles.sprite}
+              contentFit="contain"
+            />
+          </View>
         </View>
 
         <View style={styles.detailsPanel}>
@@ -101,6 +112,28 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
         </View>
       </ScrollView>
     </View>
+  );
+}
+
+function SpinningPokeball() {
+  const rotation = useSharedValue(0);
+
+  useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 8000, easing: Easing.linear }),
+      -1,
+      false,
+    );
+  }, [rotation]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  return (
+    <Animated.View style={[styles.spinningPokeball, animatedStyle]}>
+      <Pokeball width={220} height={220} color={withOpacity(colors.white, "20")} />
+    </Animated.View>
   );
 }
 
@@ -246,11 +279,20 @@ const styles = StyleSheet.create({
   summaryId: {
     flexShrink: 0,
   },
+  spriteWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 16,
+  },
+  spinningPokeball: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   sprite: {
     width: 256,
     height: 256,
     alignSelf: "center",
-    marginTop: 16,
   },
   detailsPanel: {
     backgroundColor: colors.white,

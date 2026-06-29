@@ -3,7 +3,7 @@ import { Image, type ImageStyle, StyleSheet, View, type ViewStyle } from "react-
 import { withOpacity } from "@/lib/color-utils";
 import { colors } from "@/lib/theme";
 
-const pokeballSource = require("../../../assets/images/pokeball.png");
+const pokeballSource = require("../../../assets/pokeball.png");
 
 type PokeballProps = {
   width: number;
