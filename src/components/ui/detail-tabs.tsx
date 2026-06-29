@@ -12,8 +12,8 @@ type DetailTabsProps = {
 };
 
 const TABS: { key: DetailTab; label: string }[] = [
-  { key: "about", label: "Sobre" },
-  { key: "stats", label: "Estatísticas" },
+  { key: "about", label: "About" },
+  { key: "stats", label: "Stats" },
 ];
 
 export function DetailTabs({ activeTab, onTabChange, tabWidth }: DetailTabsProps) {
@@ -47,9 +47,9 @@ export function DetailTabs({ activeTab, onTabChange, tabWidth }: DetailTabsProps
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    paddingVertical: 16,
+    paddingTop: 12,
+    paddingBottom: 20,
     marginHorizontal: 24,
-    paddingBottom: 24,
     borderBottomWidth: 1,
     borderBottomColor: colors.lightGrey,
   },
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   indicator: {
     position: "absolute",
-    bottom: -24,
+    bottom: -20,
     left: 0,
     right: 0,
     height: 2,

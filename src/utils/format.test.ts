@@ -7,12 +7,12 @@ import {
 } from "./format";
 
 describe("formatYesNo", () => {
-  it("retorna Sim para true", () => {
-    expect(formatYesNo(true)).toBe("Sim");
+  it("returns Yes for true", () => {
+    expect(formatYesNo(true)).toBe("Yes");
   });
 
-  it("retorna Não para false", () => {
-    expect(formatYesNo(false)).toBe("Não");
+  it("returns No for false", () => {
+    expect(formatYesNo(false)).toBe("No");
   });
 });
 

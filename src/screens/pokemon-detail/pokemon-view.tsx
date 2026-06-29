@@ -39,7 +39,6 @@ import {
 } from "@/utils/format";
 import { getPokemonFlavorText } from "@/utils/flavor-text";
 import {
-  capitalizeName,
   formatPokemonId,
   getPokemonImageUrl,
   getPokemonSprite,
@@ -74,7 +73,10 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: typeColor }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
             <View style={styles.summaryTypes}>
@@ -152,19 +154,17 @@ function AboutTab({
     <View style={styles.aboutContent}>
       {flavorText ? (
         <View style={styles.section}>
-          <AppText variant="body1" bold style={styles.sectionTitle}>
-            Descrição
+          <AppText variant="body1" bold>
+            Description
           </AppText>
-          <AppText variant="body3" style={styles.description}>
-            {flavorText}
-          </AppText>
+          <AppText variant="body3">{flavorText}</AppText>
         </View>
       ) : null}
 
       <View style={styles.metricsRow}>
         <ShadowContainer style={styles.metricCard}>
           <AppText variant="body3" color="grey">
-            Altura
+            Height
           </AppText>
           <AppText variant="body1" bold>
             {formatHeight(pokemon.height)}
@@ -172,7 +172,7 @@ function AboutTab({
         </ShadowContainer>
         <ShadowContainer style={styles.metricCard}>
           <AppText variant="body3" color="grey">
-            Peso
+            Weight
           </AppText>
           <AppText variant="body1" bold>
             {formatWeight(pokemon.weight)}
@@ -181,43 +181,43 @@ function AboutTab({
       </View>
 
       <View style={styles.section}>
-        <AppText variant="body1" bold style={styles.sectionTitle}>
-          Treinamento
+        <AppText variant="body1" bold>
+          Training
         </AppText>
         <InfoRow
-          label="Experiência base"
+          label="Base experience"
           value={String(pokemon.base_experience ?? "-")}
         />
       </View>
 
       <View style={styles.section}>
-        <AppText variant="body1" bold style={styles.sectionTitle}>
-          Habilidades
+        <AppText variant="body1" bold>
+          Abilities
         </AppText>
         {pokemon.pokemonabilities.map((entry) => (
           <InfoRow
             key={`${entry.ability?.name}-${entry.is_hidden}`}
-            label={capitalizeName(entry.ability?.name ?? "desconhecida")}
-            value={entry.is_hidden ? "Oculta" : "Normal"}
+            label={entry.ability?.name ?? "unknown"}
+            value={entry.is_hidden ? "Hidden" : "Normal"}
           />
         ))}
       </View>
 
       {pokemon.pokemonspecy ? (
         <View style={styles.section}>
-          <AppText variant="body1" bold style={styles.sectionTitle}>
-            Espécie
+          <AppText variant="body1" bold>
+            Species
           </AppText>
           <InfoRow
-            label="Taxa de captura"
+            label="Capture rate"
             value={String(pokemon.pokemonspecy.capture_rate ?? "-")}
           />
           <InfoRow
-            label="Lendário"
+            label="Legendary"
             value={formatYesNo(pokemon.pokemonspecy.is_legendary)}
           />
           <InfoRow
-            label="Mítico"
+            label="Mythical"
             value={formatYesNo(pokemon.pokemonspecy.is_mythical)}
           />
         </View>
@@ -232,7 +232,7 @@ function StatsTab({
   stats: DetailPokemon["pokemonstats"];
 }) {
   return (
-    <View>
+    <View style={styles.statsContent}>
       {stats.map((stat) => (
         <StatBar
           key={stat.stat?.name ?? stat.base_stat}
@@ -260,6 +260,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   summary: {
     paddingHorizontal: 24,
@@ -295,46 +298,48 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   detailsPanel: {
+    flexGrow: 1,
     backgroundColor: colors.white,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
-    paddingTop: 16,
+    paddingTop: 8,
   },
   tabContent: {
+    flexGrow: 1,
     paddingHorizontal: 24,
+    paddingTop: 8,
     paddingBottom: 32,
   },
   aboutContent: {
-    gap: 32,
+    gap: 24,
   },
   section: {
-    gap: 8,
-  },
-  sectionTitle: {
-    marginBottom: 8,
-  },
-  description: {
-    marginTop: 8,
+    gap: 12,
   },
   metricsRow: {
     flexDirection: "row",
-    gap: 16,
+    gap: 12,
   },
   metricCard: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    minHeight: 100,
+    gap: 6,
+    padding: 16,
+    minHeight: 72,
+  },
+  statsContent: {
+    gap: 4,
   },
   infoRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 16,
+    justifyContent: "space-between",
+    gap: 12,
   },
   infoLabel: {
-    width: 100,
+    flex: 1,
   },
   infoValue: {
-    flex: 1,
+    flexShrink: 0,
   },
 });

@@ -7,16 +7,16 @@ describe("normalizeFlavorText", () => {
 });
 
 describe("getPokemonFlavorText", () => {
-  it("prefers portuguese flavor text", () => {
+  it("prefers english flavor text", () => {
     expect(
       getPokemonFlavorText({
         flavor_pt: [{ flavor_text: "Texto em português." }],
         flavor_en: [{ flavor_text: "English text." }],
       }),
-    ).toBe("Texto em português.");
+    ).toBe("English text.");
   });
 
-  it("falls back to english when portuguese is missing", () => {
+  it("falls back to portuguese when english is missing", () => {
     expect(
       getPokemonFlavorText({
         flavor_pt: [],

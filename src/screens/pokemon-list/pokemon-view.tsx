@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   ActivityIndicator,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
   Pressable,
   RefreshControl,
@@ -82,7 +83,8 @@ export function PokemonListView(props: PokemonListViewProps) {
         animationType="slide"
         onRequestClose={closeFilterModal}
       >
-        <Pressable style={styles.modalOverlay} onPress={closeFilterModal}>
+        <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
+          <Pressable style={styles.backdrop} onPress={closeFilterModal} />
           <Pressable style={styles.modalContent} onPress={() => {}}>
             <View style={styles.modalHeader}>
               <AppText variant="body1" bold>
@@ -136,7 +138,7 @@ export function PokemonListView(props: PokemonListViewProps) {
               </Pressable>
             </View>
           </Pressable>
-        </Pressable>
+        </KeyboardAvoidingView>
       </Modal>
 
       <FlatList
@@ -244,6 +246,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: getThemeColorWithOpacity("black", "60"),
     justifyContent: "flex-end",
+  },
+  backdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   modalContent: {
     backgroundColor: colors.white,
