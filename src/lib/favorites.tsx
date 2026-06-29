@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,7 +34,16 @@ async function writeFavoriteIds(ids: number[]): Promise<boolean> {
   }
 }
 
-export function useFavorites() {
+type FavoritesContextValue = {
+  favoriteIds: number[];
+  isReady: boolean;
+  isFavorite: (id: number) => boolean;
+  toggleFavorite: (id: number) => Promise<boolean>;
+};
+
+const FavoritesContext = createContext<FavoritesContextValue | null>(null);
+
+function useFavoritesState(): FavoritesContextValue {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const favoriteIdsRef = useRef<number[]>([]);
   const [isReady, setIsReady] = useState(false);
@@ -75,4 +91,24 @@ export function useFavorites() {
     isFavorite,
     toggleFavorite,
   };
+}
+
+export function FavoritesProvider({ children }: { children: ReactNode }) {
+  const value = useFavoritesState();
+
+  return (
+    <FavoritesContext.Provider value={value}>
+      {children}
+    </FavoritesContext.Provider>
+  );
+}
+
+export function useFavorites() {
+  const context = useContext(FavoritesContext);
+
+  if (!context) {
+    throw new Error("useFavorites must be used within FavoritesProvider");
+  }
+
+  return context;
 }
