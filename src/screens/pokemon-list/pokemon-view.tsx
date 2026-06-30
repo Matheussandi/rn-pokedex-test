@@ -12,13 +12,7 @@ import {
 } from "react-native";
 
 import { PokemonListCard } from "@/components/pokemon-list-card";
-import {
-  AppText,
-  Chip,
-  ErrorState,
-  Input,
-  Loading,
-} from "@/components/ui";
+import { AppText, Chip, ErrorState, Input, Loading } from "@/components/ui";
 import { getThemeColorWithOpacity } from "@/lib/color-utils";
 import { colors } from "@/lib/theme";
 import { capitalizeName } from "@/utils/pokemon-image";

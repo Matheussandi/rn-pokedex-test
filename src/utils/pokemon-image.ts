@@ -33,3 +33,10 @@ export function getPokemonSprite(
 ): SpritesJson | null {
   return pokemonsprites[0]?.sprites ?? null;
 }
+
+export function getPokemonImageUrlFor(pokemon: {
+  id: number;
+  pokemonsprites: { sprites: SpritesJson }[];
+}): string {
+  return getPokemonImageUrl(pokemon.id, getPokemonSprite(pokemon.pokemonsprites));
+}

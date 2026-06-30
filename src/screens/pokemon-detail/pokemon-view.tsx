@@ -31,11 +31,7 @@ import type { usePokemonDetailModel } from "./pokemon-model";
 
 import { getPokemonFlavorText } from "@/utils/flavor-text";
 
-import {
-  formatPokemonId,
-  getPokemonImageUrl,
-  getPokemonSprite,
-} from "@/utils/pokemon-image";
+import { formatPokemonId, getPokemonImageUrlFor } from "@/utils/pokemon-image";
 
 type PokemonDetailViewProps = ReturnType<typeof usePokemonDetailModel>;
 
@@ -63,7 +59,6 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
   }
 
   const typeColor = getPrimaryTypeColor(pokemon.pokemontypes);
-  const sprite = getPokemonSprite(pokemon.pokemonsprites);
   const flavorText = getPokemonFlavorText(pokemon.pokemonspecy);
 
   return (
@@ -85,7 +80,7 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
           <View style={styles.spriteWrap}>
             <SpinningPokeball />
             <Image
-              source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
+              source={{ uri: getPokemonImageUrlFor(pokemon) }}
               style={styles.sprite}
               contentFit="contain"
             />

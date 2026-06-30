@@ -5,8 +5,6 @@ import { useQuery } from "@apollo/client/react";
 import { useRouter } from "expo-router";
 
 import {
-  ListPokemonByTypeDocument,
-  ListPokemonDocument,
   ListPokemonQuery,
   ListPokemonTypesDocument,
 } from "@/graphql/generated/graphql";
@@ -14,9 +12,14 @@ import {
 import { useFavorites } from "@/contexts/favorites";
 import { mergeById } from "@/utils/array";
 
-const PAGE_SIZE = 20;
+import {
+  PAGE_SIZE,
+  buildSearchPattern,
+  useActivePokemonList,
+  type PokemonListItem,
+} from "./use-active-pokemon-list";
 
-export type PokemonListItem = ListPokemonQuery["pokemon"][number];
+export type { PokemonListItem };
 
 export function usePokemonListModel() {
   const router = useRouter();
@@ -34,52 +37,10 @@ export function usePokemonListModel() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
-  const trimmedSearch = appliedSearch.trim();
-  const searchVariable = trimmedSearch ? `%${trimmedSearch}%` : "%";
+  const searchVariable = buildSearchPattern(appliedSearch);
 
-  const listVariables = {
-    limit: PAGE_SIZE,
-    offset,
-    search: searchVariable,
-  };
-
-  const typedListVariables = {
-    ...listVariables,
-    type: appliedType ?? "",
-  };
-
-  const {
-    data: listData,
-    loading: listLoading,
-    error: listError,
-    refetch: refetchList,
-    networkStatus: listNetworkStatus,
-  } = useQuery(ListPokemonDocument, {
-    variables: listVariables,
-    notifyOnNetworkStatusChange: true,
-    skip: !!appliedType,
-  });
-
-  const {
-    data: typedListData,
-    loading: typedListLoading,
-    error: typedListError,
-    refetch: refetchTypedList,
-    networkStatus: typedListNetworkStatus,
-  } = useQuery(ListPokemonByTypeDocument, {
-    variables: typedListVariables,
-    notifyOnNetworkStatusChange: true,
-    skip: !appliedType,
-  });
-
-  const data = appliedType ? typedListData : listData;
-  const loading = appliedType ? typedListLoading : listLoading;
-  const error = appliedType ? typedListError : listError;
-
-  const networkStatus = appliedType
-    ? typedListNetworkStatus
-    : listNetworkStatus;
-  const refetch = appliedType ? refetchTypedList : refetchList;
+  const { data, loading, error, networkStatus, refetch, refetchFirstPage } =
+    useActivePokemonList(appliedType, offset, searchVariable);
 
   const { data: typesData } = useQuery(ListPokemonTypesDocument);
 
@@ -101,12 +62,7 @@ export function usePokemonListModel() {
     setOffset(0);
 
     try {
-      await refetch({
-        limit: PAGE_SIZE,
-        offset: 0,
-        search: searchVariable,
-        ...(appliedType ? { type: appliedType } : {}),
-      });
+      await refetchFirstPage();
     } finally {
       setIsRefreshing(false);
     }
@@ -139,12 +95,20 @@ export function usePokemonListModel() {
     setIsFilterModalVisible(false);
   }
 
-  if (data?.pokemon && data !== lastSyncedData) {
+  // Acumula as páginas recebidas: substitui na primeira página e concatena nas
+  // seguintes. Comparar a referência de `data` evita reprocessar a cada render.
+  function syncAccumulatedPokemons() {
+    if (!data?.pokemon || data === lastSyncedData) {
+      return;
+    }
+
     setLastSyncedData(data);
     setPokemons((current) =>
       offset === 0 ? data.pokemon : mergeById(current, data.pokemon),
     );
   }
+
+  syncAccumulatedPokemons();
 
   return {
     pokemons,

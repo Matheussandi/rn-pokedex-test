@@ -9,8 +9,7 @@ import { CARD_HEIGHT } from "@/lib/theme";
 import {
   capitalizeName,
   formatPokemonId,
-  getPokemonImageUrl,
-  getPokemonSprite,
+  getPokemonImageUrlFor,
 } from "@/utils/pokemon-image";
 
 export type PokemonListCardProps = {
@@ -24,7 +23,6 @@ export function PokemonListCard({
   isFavorite,
   onOpen,
 }: PokemonListCardProps) {
-  const sprite = getPokemonSprite(pokemon.pokemonsprites);
   const backgroundColor = getPrimaryTypeColor(pokemon.pokemontypes);
 
   return (
@@ -57,7 +55,7 @@ export function PokemonListCard({
       </AppText>
 
       <Image
-        source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
+        source={{ uri: getPokemonImageUrlFor(pokemon) }}
         style={styles.sprite}
         contentFit="contain"
       />
