@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useQuery } from "@apollo/client/react";
 
@@ -29,6 +29,8 @@ export function usePokemonListModel() {
   const [draftType, setDraftType] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
+  const [lastSyncedData, setLastSyncedData] =
+    useState<PokemonListQuery | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
@@ -73,6 +75,7 @@ export function usePokemonListModel() {
   const data = appliedType ? typedListData : listData;
   const loading = appliedType ? typedListLoading : listLoading;
   const error = appliedType ? typedListError : listError;
+
   const networkStatus = appliedType
     ? typedListNetworkStatus
     : listNetworkStatus;
@@ -131,26 +134,17 @@ export function usePokemonListModel() {
   function applyFilters() {
     setAppliedSearch(draftSearch);
     setAppliedType(draftType);
+    setOffset(0);
+    setPokemons([]);
     setIsFilterModalVisible(false);
   }
 
-  useEffect(() => {
-    setOffset(0);
-    setPokemons([]);
-  }, [appliedSearch, appliedType]);
-
-  useEffect(() => {
-    if (!data?.pokemon) {
-      return;
-    }
-
-    if (offset === 0) {
-      setPokemons(data.pokemon);
-      return;
-    }
-
-    setPokemons((current) => mergeById(current, data.pokemon));
-  }, [data, offset]);
+  if (data?.pokemon && data !== lastSyncedData) {
+    setLastSyncedData(data);
+    setPokemons((current) =>
+      offset === 0 ? data.pokemon : mergeById(current, data.pokemon),
+    );
+  }
 
   return {
     pokemons,
