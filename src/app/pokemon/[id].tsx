@@ -14,6 +14,7 @@ export default function PokemonDetailScreen() {
   const { pokemon, loading, error, isFavorite, toggleFavorite } = modelData;
 
   const isLoaded = !loading && !error && pokemon;
+  
   const typeColor = isLoaded
     ? getPrimaryTypeColor(pokemon.pokemontypes)
     : colors.white;

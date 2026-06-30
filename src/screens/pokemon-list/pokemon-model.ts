@@ -20,6 +20,7 @@ export type PokemonListItem = PokemonListQuery["pokemon"][number];
 
 export function usePokemonListModel() {
   const router = useRouter();
+
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [appliedSearch, setAppliedSearch] = useState("");

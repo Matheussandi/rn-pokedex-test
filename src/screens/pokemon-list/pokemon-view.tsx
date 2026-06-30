@@ -83,9 +83,11 @@ export function PokemonListView(props: PokemonListViewProps) {
         animationType="slide"
         onRequestClose={closeFilterModal}
       >
-        <KeyboardAvoidingView style={styles.modalOverlay} behavior="padding">
+        <View style={styles.modalOverlay}>
           <Pressable style={styles.backdrop} onPress={closeFilterModal} />
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+          <View style={styles.bottomFiller} pointerEvents="none" />
+          <KeyboardAvoidingView style={styles.keyboardView} behavior="padding">
+            <Pressable style={styles.modalContent} onPress={() => {}}>
             <View style={styles.modalHeader}>
               <AppText variant="body1" bold>
                 Filtros
@@ -137,8 +139,9 @@ export function PokemonListView(props: PokemonListViewProps) {
                 </AppText>
               </Pressable>
             </View>
-          </Pressable>
-        </KeyboardAvoidingView>
+            </Pressable>
+          </KeyboardAvoidingView>
+        </View>
       </Modal>
 
       <FlatList
@@ -244,7 +247,6 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: getThemeColorWithOpacity("black", "60"),
     justifyContent: "flex-end",
   },
   backdrop: {
@@ -253,6 +255,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: getThemeColorWithOpacity("black", "60"),
+  },
+  keyboardView: {
+    width: "100%",
+  },
+  bottomFiller: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 120,
+    backgroundColor: colors.white,
   },
   modalContent: {
     backgroundColor: colors.white,
