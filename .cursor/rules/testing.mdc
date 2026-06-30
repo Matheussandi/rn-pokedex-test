@@ -27,7 +27,7 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 | `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual, sim/não | Lógica condicional e fallbacks |
 | `src/utils/pokemon-image.test.ts` | URL de imagem com fallback, ID formatado, capitalização | Fallback de artwork vs CDN |
 | `src/utils/array.test.ts` | `mergeById` — deduplicação na paginação | Bug silencioso em scroll infinito |
-| `src/lib/favorites.test.ts` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
+| `src/contexts/favorites/favorites.test.tsx` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
 
 ## O que foi excluído intencionalmente
 
@@ -43,7 +43,9 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 
 ```ts
 jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
+  jest.requireActual(
+    "@react-native-async-storage/async-storage/jest/async-storage-mock",
+  ),
 );
 ```
 

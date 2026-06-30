@@ -1,4 +1,4 @@
-query PokemonStats {
+query GetPokemonStats {
   pokemon_aggregate {
     aggregate {
       count

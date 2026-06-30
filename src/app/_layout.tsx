@@ -16,7 +16,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { ToastProvider } from "@/components/ui";
 import { apolloClient } from "@/graphql/client";
-import { FavoritesProvider } from "@/lib/favorites";
+import { FavoritesProvider } from "@/contexts/favorites";
 
 import { colors, fontFamily } from "@/lib/theme";
 

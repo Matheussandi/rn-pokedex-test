@@ -1,4 +1,4 @@
-query PokemonTypes {
+query ListPokemonTypes {
   type(order_by: { name: asc }) {
     id
     name

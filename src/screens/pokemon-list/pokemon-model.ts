@@ -5,18 +5,18 @@ import { useQuery } from "@apollo/client/react";
 import { useRouter } from "expo-router";
 
 import {
-  PokemonListByTypeDocument,
-  PokemonListDocument,
-  PokemonListQuery,
-  PokemonTypesDocument,
+  ListPokemonByTypeDocument,
+  ListPokemonDocument,
+  ListPokemonQuery,
+  ListPokemonTypesDocument,
 } from "@/graphql/generated/graphql";
 
-import { useFavorites } from "@/lib/favorites";
+import { useFavorites } from "@/contexts/favorites";
 import { mergeById } from "@/utils/array";
 
 const PAGE_SIZE = 20;
 
-export type PokemonListItem = PokemonListQuery["pokemon"][number];
+export type PokemonListItem = ListPokemonQuery["pokemon"][number];
 
 export function usePokemonListModel() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function usePokemonListModel() {
   const [offset, setOffset] = useState(0);
   const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
   const [lastSyncedData, setLastSyncedData] =
-    useState<PokemonListQuery | null>(null);
+    useState<ListPokemonQuery | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
@@ -54,7 +54,7 @@ export function usePokemonListModel() {
     error: listError,
     refetch: refetchList,
     networkStatus: listNetworkStatus,
-  } = useQuery(PokemonListDocument, {
+  } = useQuery(ListPokemonDocument, {
     variables: listVariables,
     notifyOnNetworkStatusChange: true,
     skip: !!appliedType,
@@ -66,7 +66,7 @@ export function usePokemonListModel() {
     error: typedListError,
     refetch: refetchTypedList,
     networkStatus: typedListNetworkStatus,
-  } = useQuery(PokemonListByTypeDocument, {
+  } = useQuery(ListPokemonByTypeDocument, {
     variables: typedListVariables,
     notifyOnNetworkStatusChange: true,
     skip: !appliedType,
@@ -81,7 +81,7 @@ export function usePokemonListModel() {
     : listNetworkStatus;
   const refetch = appliedType ? refetchTypedList : refetchList;
 
-  const { data: typesData } = useQuery(PokemonTypesDocument);
+  const { data: typesData } = useQuery(ListPokemonTypesDocument);
 
   const types = typesData?.type ?? [];
   const isInitialLoading = loading && offset === 0 && pokemons.length === 0;

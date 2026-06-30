@@ -32,12 +32,12 @@ import { colors } from "@/lib/theme";
 
 import type { usePokemonDetailModel } from "./pokemon-model";
 
+import { getPokemonFlavorText } from "@/utils/flavor-text";
 import {
   formatHeight,
   formatWeight,
   formatYesNo,
 } from "@/utils/format";
-import { getPokemonFlavorText } from "@/utils/flavor-text";
 import {
   formatPokemonId,
   getPokemonImageUrl,
@@ -50,7 +50,9 @@ export function PokemonDetailView(props: PokemonDetailViewProps) {
   const { pokemon, loading, error, refetch } = props;
 
   const { width } = useWindowDimensions();
+
   const [activeTab, setActiveTab] = useState<DetailTab>("about");
+  
   const tabWidth = (width - 48) / 2;
 
   if (loading) {

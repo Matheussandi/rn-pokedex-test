@@ -1,16 +1,8 @@
-query PokemonListByType(
-  $limit: Int!
-  $offset: Int!
-  $search: String!
-  $type: String!
-) {
+query ListPokemon($limit: Int!, $offset: Int!, $search: String!) {
   pokemon(
     limit: $limit
     offset: $offset
-    where: {
-      name: { _ilike: $search }
-      pokemontypes: { type: { name: { _eq: $type } } }
-    }
+    where: { name: { _ilike: $search } }
     order_by: { id: asc }
   ) {
     id

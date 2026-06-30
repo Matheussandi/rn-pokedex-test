@@ -2,9 +2,9 @@ import { useQuery } from "@apollo/client/react";
 
 import { useLocalSearchParams } from "expo-router";
 
-import { PokemonDetailDocument } from "@/graphql/generated/graphql";
+import { GetPokemonDetailDocument } from "@/graphql/generated/graphql";
 
-import { useFavorites } from "@/lib/favorites";
+import { useFavorites } from "@/contexts/favorites";
 
 export function usePokemonDetailModel() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -13,7 +13,7 @@ export function usePokemonDetailModel() {
 
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const { data, loading, error, refetch } = useQuery(PokemonDetailDocument, {
+  const { data, loading, error, refetch } = useQuery(GetPokemonDetailDocument, {
     variables: { id: pokemonId },
     skip: Number.isNaN(pokemonId),
   });

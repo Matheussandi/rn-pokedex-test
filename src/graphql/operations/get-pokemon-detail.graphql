@@ -1,4 +1,4 @@
-query PokemonDetail($id: Int!) {
+query GetPokemonDetail($id: Int!) {
   pokemon(where: { id: { _eq: $id } }) {
     id
     name

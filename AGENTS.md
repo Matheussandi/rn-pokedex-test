@@ -30,7 +30,7 @@ yarn start        # dev server
 
 1. Manter código simples e objetivo
 2. Queries em arquivos `.graphql`, nunca inline
-3. Favoritos persistidos em AsyncStorage (`src/lib/favorites.ts`)
+3. Favoritos persistidos em AsyncStorage (`src/contexts/favorites/`)
 4. Tratar loading, erro e empty states
 5. Ícones sempre via `@expo/vector-icons` (ver `.cursor/rules/expo-icons.mdc`)
 6. Briefing original do teste em `TECHNICAL_TEST.md`
