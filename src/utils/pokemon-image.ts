@@ -29,7 +29,7 @@ export function formatPokemonId(id: number): string {
 }
 
 export function getPokemonSprite(
-  pokemonsprites: Array<{ sprites: unknown }>,
+  pokemonsprites: { sprites: SpritesJson }[],
 ): SpritesJson | null {
-  return (pokemonsprites[0]?.sprites as SpritesJson | undefined) ?? null;
+  return pokemonsprites[0]?.sprites ?? null;
 }

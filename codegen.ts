@@ -9,6 +9,11 @@ const config: CodegenConfig = {
       presetConfig: {
         gqlTagName: "gql",
       },
+      config: {
+        scalars: {
+          jsonb: "@/utils/pokemon-image#SpritesJson",
+        },
+      },
     },
   },
   ignoreNoDocuments: true,
