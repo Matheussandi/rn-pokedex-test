@@ -2,12 +2,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Stack, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
-import { usePokemonListModel } from "@/features/pokemon-list/pokemon-model";
-import { PokemonListView } from "@/features/pokemon-list/pokemon-view";
+import { usePokemonListModel } from "@/screens/pokemon-list/pokemon-model";
+import { PokemonListView } from "@/screens/pokemon-list/pokemon-view";
+import { colors } from "@/lib/theme";
 
 export default function PokemonListScreen() {
   const modelData = usePokemonListModel();
-  
+
   const router = useRouter();
 
   return (
@@ -20,11 +21,11 @@ export default function PokemonListScreen() {
                 <Ionicons
                   name="stats-chart-outline"
                   size={22}
-                  color="#111827"
+                  color={colors.black}
                 />
               </Pressable>
               <Pressable onPress={modelData.openFilterModal}>
-                <Ionicons name="funnel-outline" size={22} color="#111827" />
+                <Ionicons name="funnel-outline" size={22} color={colors.black} />
               </Pressable>
             </View>
           ),

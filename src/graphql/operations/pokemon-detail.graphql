@@ -29,6 +29,18 @@ query PokemonDetail($id: Int!) {
       capture_rate
       is_legendary
       is_mythical
+      flavor_pt: pokemonspeciesflavortexts(
+        limit: 1
+        where: { language: { name: { _eq: "pt" } } }
+      ) {
+        flavor_text
+      }
+      flavor_en: pokemonspeciesflavortexts(
+        limit: 1
+        where: { language: { name: { _eq: "en" } } }
+      ) {
+        flavor_text
+      }
     }
     pokemonsprites {
       sprites

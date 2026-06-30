@@ -3,7 +3,7 @@ import { capitalizeName } from "./pokemon-image";
 type PokemonTypeEntry = { type?: { name: string } | null };
 
 export function formatYesNo(value: boolean): string {
-  return value ? "Sim" : "Não";
+  return value ? "Yes" : "No";
 }
 
 export function formatHeight(decimeters: number | null | undefined): string {

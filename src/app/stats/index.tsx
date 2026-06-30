@@ -1,5 +1,5 @@
-import { usePokemonStatsModel } from "@/features/pokemon-stats/pokemon-model";
-import { PokemonStatsView } from "@/features/pokemon-stats/pokemon-view";
+import { usePokemonStatsModel } from "@/screens/pokemon-stats/pokemon-model";
+import { PokemonStatsView } from "@/screens/pokemon-stats/pokemon-view";
 
 export default function PokemonStatsScreen() {
   const modelData = usePokemonStatsModel();
