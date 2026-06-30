@@ -56,7 +56,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="pokemon" options={{ headerShown: false }} />
-          <Stack.Screen name="stats" options={{ title: "Stats" }} />
+          <Stack.Screen name="stats" options={{ title: "Estatísticas" }} />
           </Stack>
         </FavoritesProvider>
       </ToastProvider>

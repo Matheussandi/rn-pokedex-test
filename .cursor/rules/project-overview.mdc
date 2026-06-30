@@ -34,4 +34,24 @@ App React Native (Expo 56) que consome a PokéAPI GraphQL v1beta2.
 - Código simples e objetivo
 - Sem lógica de negócio em `src/app/`
 - Nomes de Pokémon capitalizados na UI
-- Briefing do teste em `TECHNICAL_TEST.md`
+
+## Regras relacionadas
+
+Consulte a regra específica conforme a área que estiver tocando:
+
+- [mvvm-pattern](mdc:.cursor/rules/mvvm-pattern.mdc) — padrão MVVM das features (model/view/index)
+- [graphql-apollo](mdc:.cursor/rules/graphql-apollo.mdc) — queries `.graphql`, codegen e Apollo Client
+- [testing](mdc:.cursor/rules/testing.mdc) — estratégia e convenções de testes (Jest + RNTL)
+- [expo-icons](mdc:.cursor/rules/expo-icons.mdc) — uso de `@expo/vector-icons` para ícones
+
+## Documentação do projeto
+
+- `README.md` — como rodar, scripts e estrutura
+- `TECHNICAL_TEST.md` — briefing original do teste técnico
+
+## Documentação externa
+
+- [Expo (SDK 56)](https://docs.expo.dev/) e [Expo Router](https://docs.expo.dev/router/introduction/)
+- [Apollo Client](https://www.apollographql.com/docs/react/) e [GraphQL Code Generator](https://the-guild.dev/graphql/codegen)
+- [PokéAPI GraphQL](https://pokeapi.co/docs/graphql) — endpoint `v1beta2`
+- [React Native Testing Library](https://callstack.github.io/react-native-testing-library/)

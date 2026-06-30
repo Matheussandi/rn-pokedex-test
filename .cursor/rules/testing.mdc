@@ -31,10 +31,22 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 | `src/lib/color-utils.test.ts` | Cores por tipo, opacidade, tipo primário | Mapeamento de tema e fallbacks |
 | `src/contexts/favorites/favorites.test.tsx` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
 
+### Testes de componente (RNTL)
+
+| Arquivo de teste | O que cobre | Por quê |
+|---|---|---|
+| `src/components/pokemon-stats/stat-card.test.tsx` | Render de `label`/`value`/`description` | Card da tela de stats |
+| `src/components/ui/detail-tabs.test.tsx` | Render das labels e `onTabChange` via press | Interação de troca de aba |
+| `src/components/pokemon-detail/about-tab.test.tsx` | Flavor text condicional, habilidades, seção de espécie | Renderização condicional do detalhe |
+| `src/components/ui/favorite-button.test.tsx` | Toggle async, toast de erro, modo readonly | Core de favoritos com efeito colateral |
+| `src/components/pokemon-list-card.test.tsx` | Nome, indicador de favorito, `onOpen` | Item principal da lista |
+
+> Importante: na v14 do RNTL o `render()` é **assíncrono** — sempre `await render(...)` antes de acessar `screen`. Envolver interações que disparam state assíncrono em `await act(async () => { ... })`.
+
 ## O que foi excluído intencionalmente
 
 - **Models** (`pokemon-model.ts`) — lógica acoplada a `useQuery`, `useRouter` e `useLocalSearchParams`; mocks complexos para pouco ganho
-- **Views** (lista, detalhe, stats) — dependem de FlatList, Modal, `expo-image`; setup pesado para cobertura baixa
+- **Views** (lista, detalhe, stats) — dependem de FlatList, Modal e Apollo; setup pesado para cobertura baixa
 - **Componentes de infraestrutura** (`Loading`, `ErrorState`) — sem lógica de negócio
 
 ## Convenções

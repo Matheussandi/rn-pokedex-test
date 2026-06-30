@@ -21,7 +21,7 @@ export function AboutTab({ pokemon, flavorText }: AboutTabProps) {
       {flavorText ? (
         <View style={styles.section}>
           <AppText variant="body1" bold>
-            Description
+            Descrição
           </AppText>
           <AppText variant="body3">{flavorText}</AppText>
         </View>
@@ -30,7 +30,7 @@ export function AboutTab({ pokemon, flavorText }: AboutTabProps) {
       <View style={styles.metricsRow}>
         <ShadowContainer style={styles.metricCard}>
           <AppText variant="body3" color="grey">
-            Height
+            Altura
           </AppText>
           <AppText variant="body1" bold>
             {formatHeight(pokemon.height)}
@@ -38,7 +38,7 @@ export function AboutTab({ pokemon, flavorText }: AboutTabProps) {
         </ShadowContainer>
         <ShadowContainer style={styles.metricCard}>
           <AppText variant="body3" color="grey">
-            Weight
+            Peso
           </AppText>
           <AppText variant="body1" bold>
             {formatWeight(pokemon.weight)}
@@ -48,23 +48,23 @@ export function AboutTab({ pokemon, flavorText }: AboutTabProps) {
 
       <View style={styles.section}>
         <AppText variant="body1" bold>
-          Training
+          Treinamento
         </AppText>
         <InfoRow
-          label="Base experience"
+          label="Experiência base"
           value={String(pokemon.base_experience ?? "-")}
         />
       </View>
 
       <View style={styles.section}>
         <AppText variant="body1" bold>
-          Abilities
+          Habilidades
         </AppText>
         {pokemon.pokemonabilities.map((entry) => (
           <InfoRow
             key={`${entry.ability?.name}-${entry.is_hidden}`}
-            label={entry.ability?.name ?? "unknown"}
-            value={entry.is_hidden ? "Hidden" : "Normal"}
+            label={entry.ability?.name ?? "desconhecida"}
+            value={entry.is_hidden ? "Oculta" : "Normal"}
           />
         ))}
       </View>
@@ -72,18 +72,18 @@ export function AboutTab({ pokemon, flavorText }: AboutTabProps) {
       {pokemon.pokemonspecy ? (
         <View style={styles.section}>
           <AppText variant="body1" bold>
-            Species
+            Espécie
           </AppText>
           <InfoRow
-            label="Capture rate"
+            label="Taxa de captura"
             value={String(pokemon.pokemonspecy.capture_rate ?? "-")}
           />
           <InfoRow
-            label="Legendary"
+            label="Lendário"
             value={formatYesNo(pokemon.pokemonspecy.is_legendary)}
           />
           <InfoRow
-            label="Mythical"
+            label="Mítico"
             value={formatYesNo(pokemon.pokemonspecy.is_mythical)}
           />
         </View>

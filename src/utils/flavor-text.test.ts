@@ -7,13 +7,13 @@ describe("normalizeFlavorText", () => {
 });
 
 describe("getPokemonFlavorText", () => {
-  it("prioriza flavor text em inglês", () => {
+  it("prioriza flavor text em português", () => {
     expect(
       getPokemonFlavorText({
         flavor_pt: [{ flavor_text: "Texto em português." }],
         flavor_en: [{ flavor_text: "English text." }],
       }),
-    ).toBe("English text.");
+    ).toBe("Texto em português.");
   });
 
   it("usa inglês quando português está vazio", () => {
