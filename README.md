@@ -2,8 +2,6 @@
 
 Aplicativo mobile de exploração de Pokémon construído com Expo e React Native. Consome a [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) para listar Pokémon, exibir detalhes, gerenciar favoritos e mostrar estatísticas agregadas.
 
-O briefing original do teste técnico está em [TECHNICAL_TEST.md](./TECHNICAL_TEST.md).
-
 ## Pré-requisitos
 
 - Node.js >= 18
@@ -29,17 +27,17 @@ Escaneie o QR code com o Expo Go ou pressione `i` / `a` para abrir no simulador,
 
 ## Scripts disponíveis
 
-| Script | Descrição |
-|--------|-----------|
-| `yarn start` | Inicia o Expo dev server |
-| `yarn android` | Abre no emulador Android |
-| `yarn ios` | Abre no simulador iOS |
-| `yarn web` | Abre no navegador |
-| `yarn codegen` | Gera tipos e hooks Apollo a partir das queries GraphQL |
-| `yarn codegen:watch` | Codegen em modo watch |
-| `yarn lint` | Executa o linter |
-| `yarn test` | Roda todos os testes |
-| `yarn test:watch` | Roda testes em modo watch |
+| Script               | Descrição                                              |
+| -------------------- | ------------------------------------------------------ |
+| `yarn start`         | Inicia o Expo dev server                               |
+| `yarn android`       | Abre no emulador Android                               |
+| `yarn ios`           | Abre no simulador iOS                                  |
+| `yarn web`           | Abre no navegador                                      |
+| `yarn codegen`       | Gera tipos e hooks Apollo a partir das queries GraphQL |
+| `yarn codegen:watch` | Codegen em modo watch                                  |
+| `yarn lint`          | Executa o linter                                       |
+| `yarn test`          | Roda todos os testes                                   |
+| `yarn test:watch`    | Roda testes em modo watch                              |
 
 ## Testes
 
@@ -100,3 +98,39 @@ Rotas em `src/app/` não contêm lógica de negócio.
 - Favoritos persistidos localmente (sobrevivem ao restart)
 - Aba de estatísticas com totais e percentuais derivados da API
 - Estados de loading, erro com retry e empty state
+
+## Checklist do teste técnico
+
+Requisitos do [TECHNICAL_TEST.md](./TECHNICAL_TEST.md) e status da implementação:
+
+| Requisito                              |     | Implementação                                              |
+| -------------------------------------- | :-: | ---------------------------------------------------------- |
+| API GraphQL pública (sem autenticação) | ✅  | [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) |
+| Lista scrollável de itens              | ✅  | `FlatList` paginada em `/pokemon`                          |
+| Nome/título em cada item               | ✅  | Nome do Pokémon capitalizado no card                       |
+| Campos secundários relevantes          | ✅  | Tipos, altura e peso no card                               |
+| Indicador visual de favorito           | ✅  | Ícone no `PokemonListCard`                                 |
+| Busca por nome                         | ✅  | Modal de filtros com busca `_ilike`                        |
+| Filtro por campo relevante (tipo)      | ✅  | Chips de tipo no modal de filtros                          |
+| Tela de detalhe acessível pela lista   | ✅  | Rota `/pokemon/[id]`                                       |
+| Campos relevantes do item no detalhe   | ✅  | Stats, habilidades, espécie, flavor text, sprite           |
+| Toggle de favorito no detalhe          | ✅  | `FavoriteButton` no header                                 |
+| Favoritos persistidos localmente       | ✅  | `AsyncStorage` via `FavoritesProvider`                     |
+| Tela de estatísticas agregadas         | ✅  | Rota `/stats`                                              |
+| Total de itens (derivado da API)       | ✅  | Total de Pokémon na query de stats                         |
+| Taxa ou percentual relevante           | ✅  | Taxa de lendários (`legendaryRate`)                        |
+| Categorias distintas                   | ✅  | Quantidade de tipos distintos                              |
+| Tratamento de loading e erro           | ✅  | `Loading`, `ErrorState` com retry e empty state            |
+| Expo (managed workflow)                | ✅  | Expo SDK 56                                                |
+| Expo Router                            | ✅  | Rotas em `src/app/`                                        |
+| TypeScript                             | ✅  | Projeto em TypeScript strict                               |
+| Apollo Client                          | ✅  | `@apollo/client` + codegen                                 |
+| Testes com Jest e RNTL                 | ✅  | Utils, favoritos e componentes (`yarn test`)               |
+| Fluxos Maestro (opcional)              | ❌  | Não implementado                                           |
+| Testes Playwright web (opcional)       | ❌  | Não implementado                                           |
+
+> ✅ implementado · ❌ não implementado
+
+## Autor
+
+Desenvolvido por **[Matheus Sandi](https://github.com/Matheussandi)** como entrega do teste técnico para o time de Tecnologia da [Hubs Contabilidade](https://hubscontabilidade.com.br).
