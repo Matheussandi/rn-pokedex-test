@@ -94,14 +94,10 @@ src/
 
 ## Padrão MVVM
 
-Cada feature segue a mesma dupla de arquivos:
+Cada tela segue a mesma dupla de arquivos:
 
 - **pokemon-model.ts** — ViewModel: estado, ações e orquestração
 - **pokemon-view.tsx** — componente de UI que recebe props, sem fetch direto
-
-Hooks de dados extraídos do ViewModel (ex.: queries Apollo) ficam em `src/hooks/`.
-
-Rotas em `src/app/` não contêm lógica de negócio.
 
 ## Funcionalidades
 
