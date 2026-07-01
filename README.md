@@ -53,10 +53,38 @@ Escaneie o QR code com o Expo Go ou pressione `i` / `a` para abrir no simulador,
 
 ## Testes
 
+Jest (`jest-expo`) + React Native Testing Library. Prioridade em funções puras, lógica de favoritos e componentes de UI isolados.
+
 ```bash
 yarn test          # roda todos os testes
 yarn test:watch    # modo watch
 ```
+
+### Testes unitários
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual e valores sim/não |
+| `src/utils/pokemon-image.test.ts` | URL de sprite com fallback, ID formatado e capitalização de nome |
+| `src/utils/pagination.test.ts` | `appendNewById` — deduplicação de itens na paginação |
+| `src/utils/flavor-text.test.ts` | Normalização e seleção de flavor text (prioridade en → pt) |
+| `src/lib/color-utils.test.ts` | Cores por tipo, opacidade e tipo primário |
+
+### Testes de hook/contexto
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/contexts/favorites/favorites.test.tsx` | `useFavorites` — toggle, persistência em AsyncStorage e leitura inicial |
+
+### Testes de componentes
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/components/pokemon-list-card.test.tsx` | Nome, indicador de favorito e callback `onOpen` |
+| `src/components/ui/favorite-button.test.tsx` | Toggle assíncrono, toast de erro e modo somente leitura |
+| `src/components/ui/detail-tabs.test.tsx` | Labels das abas e `onTabChange` ao pressionar |
+| `src/components/pokemon-detail/about-tab.test.tsx` | Flavor text, habilidades e seção de espécie (render condicional) |
+| `src/components/pokemon-stats/stat-card.test.tsx` | Render de `label`, `value` e `description` |
 
 ## API utilizada
 
