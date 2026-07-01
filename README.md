@@ -2,7 +2,17 @@
 
 Aplicativo mobile de exploração de Pokémon construído com Expo e React Native. Consome a [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) para listar Pokémon, exibir detalhes, gerenciar favoritos e mostrar estatísticas agregadas.
 
-O briefing original do teste técnico está em [TECHNICAL_TEST.md](./TECHNICAL_TEST.md).
+## Apresentação
+
+Demonstração do aplicativo em execução no Expo Go.
+
+**Lista, detalhe e favorito**
+
+https://github.com/user-attachments/assets/c646f57e-3919-4ae5-9370-dee1b906cd04
+
+**Estatísticas e filtro**
+
+https://github.com/user-attachments/assets/05abfa45-5d83-4eae-b5dc-5ec2248da17a
 
 ## Pré-requisitos
 
@@ -29,24 +39,52 @@ Escaneie o QR code com o Expo Go ou pressione `i` / `a` para abrir no simulador,
 
 ## Scripts disponíveis
 
-| Script | Descrição |
-|--------|-----------|
-| `yarn start` | Inicia o Expo dev server |
-| `yarn android` | Abre no emulador Android |
-| `yarn ios` | Abre no simulador iOS |
-| `yarn web` | Abre no navegador |
-| `yarn codegen` | Gera tipos e hooks Apollo a partir das queries GraphQL |
-| `yarn codegen:watch` | Codegen em modo watch |
-| `yarn lint` | Executa o linter |
-| `yarn test` | Roda todos os testes |
-| `yarn test:watch` | Roda testes em modo watch |
+| Script               | Descrição                                              |
+| -------------------- | ------------------------------------------------------ |
+| `yarn start`         | Inicia o Expo dev server                               |
+| `yarn android`       | Abre no emulador Android                               |
+| `yarn ios`           | Abre no simulador iOS                                  |
+| `yarn web`           | Abre no navegador                                      |
+| `yarn codegen`       | Gera tipos e hooks Apollo a partir das queries GraphQL |
+| `yarn codegen:watch` | Codegen em modo watch                                  |
+| `yarn lint`          | Executa o linter                                       |
+| `yarn test`          | Roda todos os testes                                   |
+| `yarn test:watch`    | Roda testes em modo watch                              |
 
 ## Testes
+
+Jest (`jest-expo`) + React Native Testing Library. Prioridade em funções puras, lógica de favoritos e componentes de UI isolados.
 
 ```bash
 yarn test          # roda todos os testes
 yarn test:watch    # modo watch
 ```
+
+### Testes unitários
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual e valores sim/não |
+| `src/utils/pokemon-image.test.ts` | URL de sprite com fallback, ID formatado e capitalização de nome |
+| `src/utils/pagination.test.ts` | `appendNewById` — deduplicação de itens na paginação |
+| `src/utils/flavor-text.test.ts` | Normalização e seleção de flavor text (prioridade en → pt) |
+| `src/lib/color-utils.test.ts` | Cores por tipo, opacidade e tipo primário |
+
+### Testes de hook/contexto
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/contexts/favorites/favorites.test.tsx` | `useFavorites` — toggle, persistência em AsyncStorage e leitura inicial |
+
+### Testes de componentes
+
+| Arquivo | O que cobre |
+| --- | --- |
+| `src/components/pokemon-list-card.test.tsx` | Nome, indicador de favorito e callback `onOpen` |
+| `src/components/ui/favorite-button.test.tsx` | Toggle assíncrono, toast de erro e modo somente leitura |
+| `src/components/ui/detail-tabs.test.tsx` | Labels das abas e `onTabChange` ao pressionar |
+| `src/components/pokemon-detail/about-tab.test.tsx` | Flavor text, habilidades e seção de espécie (render condicional) |
+| `src/components/pokemon-stats/stat-card.test.tsx` | Render de `label`, `value` e `description` |
 
 ## API utilizada
 
@@ -63,34 +101,31 @@ yarn test:watch    # modo watch
 
 ```
 src/
-  app/                    # Rotas Expo Router (finas, apenas re-exportam features)
+  app/                    # Rotas Expo Router (finas, compõem model + view)
     (tabs)/               # Abas: Pokédex | Stats
     pokemon/[id].tsx      # Detalhe do Pokémon
-  features/               # MVVM por feature
+  screens/                # MVVM por feature
     pokemon-list/
-      pokemon-model.ts    # ViewModel (estado, queries, ações)
+      pokemon-model.ts    # ViewModel (estado, ações)
       pokemon-view.tsx    # UI pura
-      index.tsx           # Composição model + view
     pokemon-detail/
     pokemon-stats/
+  hooks/                  # Hooks de dados (queries Apollo abstraídas)
+    use-active-pokemon-list.ts
   graphql/
     client.ts             # Apollo Client
     operations/           # Queries .graphql
     generated/            # Tipos e hooks gerados pelo codegen
-  lib/
-    favorites.ts          # Persistência de favoritos (AsyncStorage)
-    pokemon-image.ts      # Helper de URL de sprite
+  utils/                  # Funções puras (paginação, formatação, etc.)
+  lib/                    # Tema, cores, haptics
 ```
 
 ## Padrão MVVM
 
-Cada feature segue a mesma tríade de arquivos:
+Cada tela segue a mesma dupla de arquivos:
 
-- **pokemon-model.ts** — hook com lógica de negócio, estado e integração Apollo
+- **pokemon-model.ts** — ViewModel: estado, ações e orquestração
 - **pokemon-view.tsx** — componente de UI que recebe props, sem fetch direto
-- **index.tsx** — conecta o model à view
-
-Rotas em `src/app/` não contêm lógica de negócio.
 
 ## Funcionalidades
 
@@ -99,3 +134,39 @@ Rotas em `src/app/` não contêm lógica de negócio.
 - Favoritos persistidos localmente (sobrevivem ao restart)
 - Aba de estatísticas com totais e percentuais derivados da API
 - Estados de loading, erro com retry e empty state
+
+## Checklist do teste técnico
+
+Requisitos do [TECHNICAL_TEST.md](./TECHNICAL_TEST.md) e status da implementação:
+
+| Requisito                              |     | Implementação                                              |
+| -------------------------------------- | :-: | ---------------------------------------------------------- |
+| API GraphQL pública (sem autenticação) | ✅  | [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) |
+| Lista scrollável de itens              | ✅  | `FlatList` paginada em `/pokemon`                          |
+| Nome/título em cada item               | ✅  | Nome do Pokémon capitalizado no card                       |
+| Campos secundários relevantes          | ✅  | Tipos, altura e peso no card                               |
+| Indicador visual de favorito           | ✅  | Ícone no `PokemonListCard`                                 |
+| Busca por nome                         | ✅  | Modal de filtros com busca `_ilike`                        |
+| Filtro por campo relevante (tipo)      | ✅  | Chips de tipo no modal de filtros                          |
+| Tela de detalhe acessível pela lista   | ✅  | Rota `/pokemon/[id]`                                       |
+| Campos relevantes do item no detalhe   | ✅  | Stats, habilidades, espécie, flavor text, sprite           |
+| Toggle de favorito no detalhe          | ✅  | `FavoriteButton` no header                                 |
+| Favoritos persistidos localmente       | ✅  | `AsyncStorage` via `FavoritesProvider`                     |
+| Tela de estatísticas agregadas         | ✅  | Rota `/stats`                                              |
+| Total de itens (derivado da API)       | ✅  | Total de Pokémon na query de stats                         |
+| Taxa ou percentual relevante           | ✅  | Taxa de lendários (`legendaryRate`)                        |
+| Categorias distintas                   | ✅  | Quantidade de tipos distintos                              |
+| Tratamento de loading e erro           | ✅  | `Loading`, `ErrorState` com retry e empty state            |
+| Expo (managed workflow)                | ✅  | Expo SDK 56                                                |
+| Expo Router                            | ✅  | Rotas em `src/app/`                                        |
+| TypeScript                             | ✅  | Projeto em TypeScript strict                               |
+| Apollo Client                          | ✅  | `@apollo/client` + codegen                                 |
+| Testes com Jest e RNTL                 | ✅  | Utils, favoritos e componentes (`yarn test`)               |
+| Fluxos Maestro (opcional)              | ❌  | Não implementado                                           |
+| Testes Playwright web (opcional)       | ❌  | Não implementado                                           |
+
+> ✅ implementado · ❌ não implementado
+
+## Autor
+
+Desenvolvido por **[Matheus Sandi](https://github.com/Matheussandi)** como entrega do teste técnico para o time de Tecnologia da [Hubs Contabilidade](https://hubscontabilidade.com.br).

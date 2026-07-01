@@ -26,28 +26,129 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 |---|---|---|
 | `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual, sim/não | Lógica condicional e fallbacks |
 | `src/utils/pokemon-image.test.ts` | URL de imagem com fallback, ID formatado, capitalização | Fallback de artwork vs CDN |
-| `src/utils/array.test.ts` | `mergeById` — deduplicação na paginação | Bug silencioso em scroll infinito |
-| `src/lib/favorites.test.ts` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
+| `src/utils/pagination.test.ts` | `appendNewById` — deduplicação na paginação | Bug silencioso em scroll infinito |
+| `src/utils/flavor-text.test.ts` | Normalização e seleção de flavor text (en/pt) | Prioridade de idioma e fallbacks |
+| `src/lib/color-utils.test.ts` | Cores por tipo, opacidade, tipo primário | Mapeamento de tema e fallbacks |
+| `src/contexts/favorites/favorites.test.tsx` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
+
+### Testes de componente (RNTL)
+
+| Arquivo de teste | O que cobre | Por quê |
+|---|---|---|
+| `src/components/pokemon-stats/stat-card.test.tsx` | Render de `label`/`value`/`description` | Card da tela de stats |
+| `src/components/ui/detail-tabs.test.tsx` | Render das labels e `onTabChange` via press | Interação de troca de aba |
+| `src/components/pokemon-detail/about-tab.test.tsx` | Flavor text condicional, habilidades, seção de espécie | Renderização condicional do detalhe |
+| `src/components/ui/favorite-button.test.tsx` | Toggle async, toast de erro, modo readonly | Core de favoritos com efeito colateral |
+| `src/components/pokemon-list-card.test.tsx` | Nome, indicador de favorito, `onOpen` | Item principal da lista |
+
+> Importante: na v14 do RNTL o `render()` é **assíncrono** — sempre `await render(...)` antes de acessar `screen`. Envolver interações que disparam state assíncrono em `await act(async () => { ... })`.
 
 ## O que foi excluído intencionalmente
 
 - **Models** (`pokemon-model.ts`) — lógica acoplada a `useQuery`, `useRouter` e `useLocalSearchParams`; mocks complexos para pouco ganho
-- **Views** (lista, detalhe, stats) — dependem de FlatList, Modal, `expo-image`; setup pesado para cobertura baixa
+- **Views** (lista, detalhe, stats) — dependem de FlatList, Modal e Apollo; setup pesado para cobertura baixa
 - **Componentes de infraestrutura** (`Loading`, `ErrorState`) — sem lógica de negócio
+
+## Convenções
+
+### Organização
+
+1. Arquivo colocado **ao lado do módulo testado**: `{nome}.test.ts` ou `{nome}.test.tsx`
+2. Um bloco `describe` por **função exportada** testada
+3. Um bloco `it` por **cenário** (caminho feliz, edge case, fallback)
+4. Import relativo do módulo: `from "./format"` (não usar alias `@/` nos testes)
+
+### Nomenclatura
+
+- Descrições dos `it` em **português**, no imperativo ou indicativo: `"formata altura em decímetros"`, `"retorna null quando array está vazio"`
+- Nome do `describe` = nome da função exportada: `describe("appendNewById", ...)`
+
+### Funções puras (`*.test.ts`)
+
+Padrão usado em `utils/` e `lib/`:
+
+```ts
+import { minhaFuncao } from "./meu-modulo";
+
+describe("minhaFuncao", () => {
+  it("descreve o comportamento esperado", () => {
+    expect(minhaFuncao(input)).toBe(esperado);
+  });
+
+  it("trata edge case (null, vazio, fallback)", () => {
+    expect(minhaFuncao(null)).toBe(fallback);
+  });
+});
+```
+
+Regras:
+
+- Sem mocks, sem setup global — apenas import + assert
+- Cobrir **fallbacks** (`null`, `undefined`, array vazio, valor desconhecido)
+- Preferir `.toBe()` para primitivos, `.toEqual()` para objetos/arrays, `.toBeNull()` para null
+
+### Hooks e contextos (`*.test.tsx`)
+
+Padrão usado em `contexts/favorites/favorites.test.tsx`:
+
+```tsx
+import type { ReactNode } from "react";
+
+import { act, renderHook, waitFor } from "@testing-library/react-native";
+
+import { MeuProvider, useMeuHook } from "./meu-context";
+
+jest.mock("@react-native-async-storage/async-storage", () =>
+  jest.requireActual(
+    "@react-native-async-storage/async-storage/jest/async-storage-mock",
+  ),
+);
+
+function wrapper({ children }: { children: ReactNode }) {
+  return <MeuProvider>{children}</MeuProvider>;
+}
+
+describe("useMeuHook", () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+  });
+
+  it("descreve comportamento assíncrono", async () => {
+    const { result } = await renderHook(() => useMeuHook(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current?.isReady).toBe(true);
+    });
+
+    await act(async () => {
+      await result.current?.algumaAcao();
+    });
+
+    expect(result.current?.algumEstado).toBe(esperado);
+  });
+});
+```
+
+Regras:
+
+- Usar `await renderHook()` — na v14 do RTL, `renderHook` retorna uma `Promise`
+- Envolver mutações de estado em `await act(async () => { ... })`
+- Usar `waitFor` para efeitos assíncronos (carregamento inicial, persistência)
+- `beforeEach` para limpar estado compartilhado (AsyncStorage, spies)
+- Mock de AsyncStorage via `jest.requireActual` (não usar `require()` — proibido pelo ESLint)
+
+### O que evitar
+
+- Mocks de Apollo Client, Expo Router ou componentes nativos
+- Testes de snapshot para UI
+- Lógica de negócio duplicada dentro do teste — testar comportamento, não implementação interna
+- `require()` nos mocks — usar `jest.requireActual()` ou import com prefixo `mock` (cuidado com hoisting do Jest)
 
 ## Como adicionar novos testes
 
-1. Criar arquivo `*.test.ts` ou `*.test.tsx` ao lado do módulo testado (o preset `jest-expo` reconhece `-test.ts|tsx` e `*.test.ts|tsx`)
-2. Para hooks, usar `await renderHook()` — na v14 do RTL, `renderHook` retorna uma `Promise`
-3. Para AsyncStorage, usar o mock oficial:
-
-```ts
-jest.mock("@react-native-async-storage/async-storage", () =>
-  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
-);
-```
-
-4. Instalar novas deps de teste via `yarn expo install <pacote> --dev` para garantir compatibilidade com o SDK
+1. Criar `{modulo}.test.ts` ou `{modulo}.test.tsx` ao lado do módulo
+2. Seguir o padrão de função pura ou hook conforme a seção **Convenções**
+3. Instalar novas deps de teste via `yarn expo install <pacote> --dev` para compatibilidade com o SDK
 
 ## Configuração
 

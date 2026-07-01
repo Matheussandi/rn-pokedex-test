@@ -7,11 +7,11 @@ import {
 } from "./format";
 
 describe("formatYesNo", () => {
-  it("returns Yes for true", () => {
+  it("retorna Yes para true", () => {
     expect(formatYesNo(true)).toBe("Yes");
   });
 
-  it("returns No for false", () => {
+  it("retorna No para false", () => {
     expect(formatYesNo(false)).toBe("No");
   });
 });

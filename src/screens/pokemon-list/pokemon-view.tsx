@@ -11,29 +11,13 @@ import {
   View,
 } from "react-native";
 
-import { Image } from "expo-image";
+import { PokemonListCard } from "@/components/pokemon-list-card";
+import { AppText, Chip, ErrorState, Input, Loading } from "@/components/ui";
+import { getThemeColorWithOpacity } from "@/lib/color-utils";
+import { colors } from "@/lib/theme";
+import { capitalizeName } from "@/utils/pokemon-image";
 
-import {
-  AppText,
-  Chip,
-  ErrorState,
-  FavoriteButton,
-  Input,
-  Loading,
-  Pokeball,
-  PokemonTypes,
-} from "@/components/ui";
-import { getPrimaryTypeColor, getThemeColorWithOpacity } from "@/lib/color-utils";
-import { CARD_HEIGHT, colors } from "@/lib/theme";
-
-import type { PokemonListItem, usePokemonListModel } from "./pokemon-model";
-
-import {
-  capitalizeName,
-  formatPokemonId,
-  getPokemonImageUrl,
-  getPokemonSprite,
-} from "@/utils/pokemon-image";
+import type { usePokemonListModel } from "./pokemon-model";
 
 type PokemonListViewProps = ReturnType<typeof usePokemonListModel>;
 
@@ -184,62 +168,6 @@ export function PokemonListView(props: PokemonListViewProps) {
   );
 }
 
-function PokemonListCard({
-  pokemon,
-  isFavorite,
-  onOpen,
-}: {
-  pokemon: PokemonListItem;
-  isFavorite: boolean;
-  onOpen: () => void;
-}) {
-  const sprite = getPokemonSprite(pokemon.pokemonsprites);
-  const backgroundColor = getPrimaryTypeColor(pokemon.pokemontypes);
-
-  return (
-    <Pressable
-      style={[styles.card, { backgroundColor }]}
-      onPress={onOpen}
-    >
-      <FavoriteButton
-        readonly
-        isFavorite={isFavorite}
-        size={14}
-        style={styles.favoriteIndicator}
-      />
-
-      <View style={styles.cardContent}>
-        <AppText
-          variant="body3"
-          color="white"
-          bold
-          numberOfLines={1}
-        >
-          {capitalizeName(pokemon.name)}
-        </AppText>
-
-        <PokemonTypes types={pokemon.pokemontypes} size="small" />
-      </View>
-
-      <AppText variant="caption" style={styles.cardId}>
-        {formatPokemonId(pokemon.id)}
-      </AppText>
-
-      <Image
-        source={{ uri: getPokemonImageUrl(pokemon.id, sprite) }}
-        style={styles.sprite}
-        contentFit="contain"
-      />
-
-      <Pokeball
-        width={80}
-        height={80}
-        style={styles.pokeball}
-      />
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -326,49 +254,6 @@ const styles = StyleSheet.create({
   columnWrapper: {
     gap: 10,
     marginBottom: 10,
-  },
-  card: {
-    flex: 1,
-    height: CARD_HEIGHT,
-    padding: 16,
-    borderRadius: 12,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  cardId: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    fontSize: 10,
-    color: getThemeColorWithOpacity("black", "30"),
-  },
-  cardContent: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    right: 28,
-    gap: 4,
-  },
-  favoriteIndicator: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-  sprite: {
-    position: "absolute",
-    right: 4,
-    bottom: 4,
-    width: 72,
-    height: 72,
-  },
-  pokeball: {
-    position: "absolute",
-    right: -8,
-    bottom: -8,
   },
   footerLoader: {
     marginVertical: 8,

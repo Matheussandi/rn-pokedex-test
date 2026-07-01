@@ -1,22 +1,22 @@
 import { getPokemonFlavorText, normalizeFlavorText } from "./flavor-text";
 
 describe("normalizeFlavorText", () => {
-  it("removes form feeds and newlines", () => {
+  it("remove form feeds e quebras de linha", () => {
     expect(normalizeFlavorText("Hello\fworld\n\n test")).toBe("Hello world test");
   });
 });
 
 describe("getPokemonFlavorText", () => {
-  it("prefers english flavor text", () => {
+  it("prioriza flavor text em português", () => {
     expect(
       getPokemonFlavorText({
         flavor_pt: [{ flavor_text: "Texto em português." }],
         flavor_en: [{ flavor_text: "English text." }],
       }),
-    ).toBe("English text.");
+    ).toBe("Texto em português.");
   });
 
-  it("falls back to portuguese when english is missing", () => {
+  it("usa inglês quando português está vazio", () => {
     expect(
       getPokemonFlavorText({
         flavor_pt: [],
@@ -25,7 +25,7 @@ describe("getPokemonFlavorText", () => {
     ).toBe("English text.");
   });
 
-  it("returns null when no flavor text exists", () => {
+  it("retorna null quando não há flavor text", () => {
     expect(getPokemonFlavorText(null)).toBeNull();
     expect(getPokemonFlavorText({ flavor_pt: [], flavor_en: [] })).toBeNull();
   });

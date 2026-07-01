@@ -4,19 +4,19 @@ import { useQuery } from "@apollo/client/react";
 
 import { useRouter } from "expo-router";
 
+import { ListPokemonTypesDocument } from "@/graphql/generated/graphql";
+
+import { useFavorites } from "@/contexts/favorites";
+import { appendNewById } from "@/utils/pagination";
+import { buildSearchPattern } from "@/utils/search-pattern";
+
 import {
-  PokemonListByTypeDocument,
-  PokemonListDocument,
-  PokemonListQuery,
-  PokemonTypesDocument,
-} from "@/graphql/generated/graphql";
+  PAGE_SIZE,
+  useActivePokemonList,
+  type PokemonListItem,
+} from "@/hooks/use-active-pokemon-list";
 
-import { useFavorites } from "@/lib/favorites";
-import { mergeById } from "@/utils/array";
-
-const PAGE_SIZE = 20;
-
-export type PokemonListItem = PokemonListQuery["pokemon"][number];
+export type { PokemonListItem };
 
 export function usePokemonListModel() {
   const router = useRouter();
@@ -32,82 +32,17 @@ export function usePokemonListModel() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
-  const trimmedSearch = appliedSearch.trim();
-  const searchVariable = trimmedSearch ? `%${trimmedSearch}%` : "%";
+  const searchVariable = buildSearchPattern(appliedSearch);
 
-  const listVariables = {
-    limit: PAGE_SIZE,
-    offset,
-    search: searchVariable,
-  };
+  const { data, loading, error, networkStatus, refetch, refetchFirstPage } =
+    useActivePokemonList(appliedType, offset, searchVariable);
 
-  const typedListVariables = {
-    ...listVariables,
-    type: appliedType ?? "",
-  };
-
-  const {
-    data: listData,
-    loading: listLoading,
-    error: listError,
-    refetch: refetchList,
-    networkStatus: listNetworkStatus,
-  } = useQuery(PokemonListDocument, {
-    variables: listVariables,
-    notifyOnNetworkStatusChange: true,
-    skip: !!appliedType,
-  });
-
-  const {
-    data: typedListData,
-    loading: typedListLoading,
-    error: typedListError,
-    refetch: refetchTypedList,
-    networkStatus: typedListNetworkStatus,
-  } = useQuery(PokemonListByTypeDocument, {
-    variables: typedListVariables,
-    notifyOnNetworkStatusChange: true,
-    skip: !appliedType,
-  });
-
-  const data = appliedType ? typedListData : listData;
-  const loading = appliedType ? typedListLoading : listLoading;
-  const error = appliedType ? typedListError : listError;
-  const networkStatus = appliedType
-    ? typedListNetworkStatus
-    : listNetworkStatus;
-  const refetch = appliedType ? refetchTypedList : refetchList;
-
-  const { data: typesData } = useQuery(PokemonTypesDocument);
+  const { data: typesData } = useQuery(ListPokemonTypesDocument);
 
   const types = typesData?.type ?? [];
   const isInitialLoading = loading && offset === 0 && pokemons.length === 0;
   const isLoadingMore = loading && offset > 0;
   const hasMore = (data?.pokemon.length ?? 0) === PAGE_SIZE;
-
-  function loadMore() {
-    if (loading || !hasMore) {
-      return;
-    }
-
-    setOffset((current) => current + PAGE_SIZE);
-  }
-
-  async function refresh() {
-    setIsRefreshing(true);
-    setOffset(0);
-
-    try {
-      await refetch({
-        limit: PAGE_SIZE,
-        offset: 0,
-        search: searchVariable,
-        ...(appliedType ? { type: appliedType } : {}),
-      });
-    } finally {
-      setIsRefreshing(false);
-    }
-  }
 
   function openDetail(id: number) {
     router.push(`/pokemon/${id}`);
@@ -131,25 +66,39 @@ export function usePokemonListModel() {
   function applyFilters() {
     setAppliedSearch(draftSearch);
     setAppliedType(draftType);
+    setOffset(0);
+    setPokemons([]);
     setIsFilterModalVisible(false);
   }
 
-  useEffect(() => {
+  function loadMore() {
+    if (loading || !hasMore) {
+      return;
+    }
+
+    setOffset((current) => current + PAGE_SIZE);
+  }
+
+  async function refresh() {
+    setIsRefreshing(true);
     setOffset(0);
-    setPokemons([]);
-  }, [appliedSearch, appliedType]);
+
+    try {
+      await refetchFirstPage();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   useEffect(() => {
     if (!data?.pokemon) {
       return;
     }
 
-    if (offset === 0) {
-      setPokemons(data.pokemon);
-      return;
-    }
-
-    setPokemons((current) => mergeById(current, data.pokemon));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPokemons((current) =>
+      offset === 0 ? data.pokemon : appendNewById(current, data.pokemon),
+    );
   }, [data, offset]);
 
   return {

@@ -16,7 +16,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { ToastProvider } from "@/components/ui";
 import { apolloClient } from "@/graphql/client";
-import { FavoritesProvider } from "@/lib/favorites";
+import { FavoritesProvider } from "@/contexts/favorites";
 
 import { colors, fontFamily } from "@/lib/theme";
 
@@ -56,7 +56,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="pokemon" options={{ headerShown: false }} />
-          <Stack.Screen name="stats" options={{ title: "Stats" }} />
+          <Stack.Screen name="stats" options={{ title: "Estatísticas" }} />
           </Stack>
         </FavoritesProvider>
       </ToastProvider>

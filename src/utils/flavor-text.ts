@@ -14,14 +14,14 @@ export function normalizeFlavorText(text: string): string {
 }
 
 export function getPokemonFlavorText(species: SpeciesWithFlavor): string | null {
-  const en = species?.flavor_en?.[0]?.flavor_text;
-  if (en) {
-    return normalizeFlavorText(en);
-  }
-
   const pt = species?.flavor_pt?.[0]?.flavor_text;
   if (pt) {
     return normalizeFlavorText(pt);
+  }
+
+  const en = species?.flavor_en?.[0]?.flavor_text;
+  if (en) {
+    return normalizeFlavorText(en);
   }
 
   return null;

@@ -12,8 +12,8 @@ type DetailTabsProps = {
 };
 
 const TABS: { key: DetailTab; label: string }[] = [
-  { key: "about", label: "About" },
-  { key: "stats", label: "Stats" },
+  { key: "about", label: "Sobre" },
+  { key: "stats", label: "Status" },
 ];
 
 export function DetailTabs({ activeTab, onTabChange, tabWidth }: DetailTabsProps) {
