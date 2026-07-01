@@ -2,6 +2,18 @@
 
 Aplicativo mobile de exploração de Pokémon construído com Expo e React Native. Consome a [PokéAPI GraphQL v1beta2](https://pokeapi.co/docs/graphql) para listar Pokémon, exibir detalhes, gerenciar favoritos e mostrar estatísticas agregadas.
 
+## Apresentação
+
+Demonstração do aplicativo em execução no Expo Go.
+
+**Lista, detalhe e favorito**
+
+https://github.com/user-attachments/assets/c646f57e-3919-4ae5-9370-dee1b906cd04
+
+**Estatísticas e filtro**
+
+https://github.com/user-attachments/assets/05abfa45-5d83-4eae-b5dc-5ec2248da17a
+
 ## Pré-requisitos
 
 - Node.js >= 18
