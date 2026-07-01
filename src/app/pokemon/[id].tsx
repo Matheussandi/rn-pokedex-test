@@ -29,6 +29,7 @@ export default function PokemonDetailScreen() {
                 <FavoriteButton
                   isFavorite={isFavorite}
                   onToggle={toggleFavorite}
+                  withBadge
                 />
               )
             : undefined,

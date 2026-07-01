@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -11,10 +11,12 @@ import {
 } from "react-native";
 
 import { useToast } from "@/components/ui/toast";
+import { getThemeColorWithOpacity } from "@/lib/color-utils";
 import { triggerFavoriteHaptic } from "@/lib/haptics";
 import { colors, POKEMON_TYPE_COLORS } from "@/lib/theme";
 
 const FAVORITE_COLOR = POKEMON_TYPE_COLORS.electric;
+const BADGE_PADDING = 6;
 const ERROR_MESSAGE = "Não foi possível salvar o favorito. Tente novamente.";
 
 type FavoriteButtonProps = {
@@ -23,8 +25,34 @@ type FavoriteButtonProps = {
   readonly?: boolean;
   size?: number;
   inactiveColor?: string;
+  withBadge?: boolean;
   style?: StyleProp<ViewStyle>;
 };
+
+function IconBadge({
+  size,
+  children,
+}: {
+  size: number;
+  children: ReactNode;
+}) {
+  const badgeSize = size + BADGE_PADDING * 2;
+
+  return (
+    <View
+      style={[
+        styles.badge,
+        {
+          width: badgeSize,
+          height: badgeSize,
+          borderRadius: badgeSize / 2,
+        },
+      ]}
+    >
+      {children}
+    </View>
+  );
+}
 
 export function FavoriteButton({
   isFavorite,
@@ -32,6 +60,7 @@ export function FavoriteButton({
   readonly = false,
   size = 22,
   inactiveColor = colors.white,
+  withBadge = false,
   style,
 }: FavoriteButtonProps) {
   const { showToast } = useToast();
@@ -90,10 +119,12 @@ export function FavoriteButton({
     </Animated.View>
   );
 
+  const content = withBadge ? <IconBadge size={size}>{icon}</IconBadge> : icon;
+
   if (readonly) {
     return (
       <View style={style} accessibilityLabel={accessibilityLabel}>
-        {icon}
+        {content}
       </View>
     );
   }
@@ -106,12 +137,17 @@ export function FavoriteButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >
-      {icon}
+      {content}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  badge: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: getThemeColorWithOpacity("black", "40"),
+  },
   button: {
     marginRight: 4,
   },

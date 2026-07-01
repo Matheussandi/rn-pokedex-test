@@ -34,6 +34,7 @@ export function PokemonListCard({
         readonly
         isFavorite={isFavorite}
         size={14}
+        withBadge
         style={styles.favoriteIndicator}
       />
 

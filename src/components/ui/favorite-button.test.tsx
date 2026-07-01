@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-
 
 import { FavoriteButton } from "./favorite-button";
 import { ToastProvider } from "./toast";
+import { colors } from "@/lib/theme";
 
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
@@ -57,5 +58,14 @@ describe("FavoriteButton", () => {
     await renderWithToast(<FavoriteButton isFavorite readonly />);
 
     expect(screen.getByLabelText("Favorito")).toBeOnTheScreen();
+  });
+
+  it("renderiza badge de fundo quando withBadge é true", async () => {
+    const { toJSON } = await renderWithToast(
+      <FavoriteButton isFavorite withBadge />,
+    );
+
+    const tree = JSON.stringify(toJSON());
+    expect(tree).toContain(`${colors.black}40`);
   });
 });
