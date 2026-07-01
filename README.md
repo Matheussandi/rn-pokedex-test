@@ -63,32 +63,33 @@ yarn test:watch    # modo watch
 
 ```
 src/
-  app/                    # Rotas Expo Router (finas, apenas re-exportam features)
+  app/                    # Rotas Expo Router (finas, compõem model + view)
     (tabs)/               # Abas: Pokédex | Stats
     pokemon/[id].tsx      # Detalhe do Pokémon
-  features/               # MVVM por feature
+  screens/                # MVVM por feature
     pokemon-list/
-      pokemon-model.ts    # ViewModel (estado, queries, ações)
+      pokemon-model.ts    # ViewModel (estado, ações)
       pokemon-view.tsx    # UI pura
-      index.tsx           # Composição model + view
     pokemon-detail/
     pokemon-stats/
+  hooks/                  # Hooks de dados (queries Apollo abstraídas)
+    use-active-pokemon-list.ts
   graphql/
     client.ts             # Apollo Client
     operations/           # Queries .graphql
     generated/            # Tipos e hooks gerados pelo codegen
-  lib/
-    favorites.ts          # Persistência de favoritos (AsyncStorage)
-    pokemon-image.ts      # Helper de URL de sprite
+  utils/                  # Funções puras (paginação, formatação, etc.)
+  lib/                    # Tema, cores, haptics
 ```
 
 ## Padrão MVVM
 
-Cada feature segue a mesma tríade de arquivos:
+Cada feature segue a mesma dupla de arquivos:
 
-- **pokemon-model.ts** — hook com lógica de negócio, estado e integração Apollo
+- **pokemon-model.ts** — ViewModel: estado, ações e orquestração
 - **pokemon-view.tsx** — componente de UI que recebe props, sem fetch direto
-- **index.tsx** — conecta o model à view
+
+Hooks de dados extraídos do ViewModel (ex.: queries Apollo) ficam em `src/hooks/`.
 
 Rotas em `src/app/` não contêm lógica de negócio.
 

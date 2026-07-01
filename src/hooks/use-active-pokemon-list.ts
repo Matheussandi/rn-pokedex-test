@@ -10,12 +10,7 @@ export const PAGE_SIZE = 20;
 
 export type PokemonListItem = ListPokemonQuery["pokemon"][number];
 
-export function buildSearchPattern(search: string): string {
-  const trimmed = search.trim();
-  return trimmed ? `%${trimmed}%` : "%";
-}
-
-export function buildListVariables(
+function buildListVariables(
   offset: number,
   search: string,
   type: string | null,
@@ -24,10 +19,6 @@ export function buildListVariables(
   return type ? { ...base, type } : base;
 }
 
-/**
- * Executa a query correta (lista completa x filtrada por tipo) e expõe um
- * resultado único, escondendo de quem consome que existem duas queries por baixo.
- */
 export function useActivePokemonList(
   appliedType: string | null,
   offset: number,

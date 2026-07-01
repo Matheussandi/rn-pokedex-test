@@ -26,7 +26,7 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 |---|---|---|
 | `src/utils/format.test.ts` | Formatação de tipos, altura, peso, percentual, sim/não | Lógica condicional e fallbacks |
 | `src/utils/pokemon-image.test.ts` | URL de imagem com fallback, ID formatado, capitalização | Fallback de artwork vs CDN |
-| `src/utils/array.test.ts` | `mergeById` — deduplicação na paginação | Bug silencioso em scroll infinito |
+| `src/utils/pagination.test.ts` | `appendNewById` — deduplicação na paginação | Bug silencioso em scroll infinito |
 | `src/utils/flavor-text.test.ts` | Normalização e seleção de flavor text (en/pt) | Prioridade de idioma e fallbacks |
 | `src/lib/color-utils.test.ts` | Cores por tipo, opacidade, tipo primário | Mapeamento de tema e fallbacks |
 | `src/contexts/favorites/favorites.test.tsx` | Hook `useFavorites` — toggle, persistência, leitura inicial | Lógica de negócio com AsyncStorage |
@@ -61,7 +61,7 @@ Priorizamos funções puras e lógica de negócio com alto retorno e baixo custo
 ### Nomenclatura
 
 - Descrições dos `it` em **português**, no imperativo ou indicativo: `"formata altura em decímetros"`, `"retorna null quando array está vazio"`
-- Nome do `describe` = nome da função exportada: `describe("mergeById", ...)`
+- Nome do `describe` = nome da função exportada: `describe("appendNewById", ...)`
 
 ### Funções puras (`*.test.ts`)
 

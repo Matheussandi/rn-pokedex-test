@@ -1,4 +1,4 @@
-export function mergeById<T extends { id: number }>(
+export function appendNewById<T extends { id: number }>(
   current: T[],
   incoming: T[],
 ): T[] {

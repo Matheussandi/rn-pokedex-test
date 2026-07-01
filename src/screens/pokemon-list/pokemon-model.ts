@@ -1,23 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "@apollo/client/react";
 
 import { useRouter } from "expo-router";
 
-import {
-  ListPokemonQuery,
-  ListPokemonTypesDocument,
-} from "@/graphql/generated/graphql";
+import { ListPokemonTypesDocument } from "@/graphql/generated/graphql";
 
 import { useFavorites } from "@/contexts/favorites";
-import { mergeById } from "@/utils/array";
+import { appendNewById } from "@/utils/pagination";
+import { buildSearchPattern } from "@/utils/search-pattern";
 
 import {
   PAGE_SIZE,
-  buildSearchPattern,
   useActivePokemonList,
   type PokemonListItem,
-} from "./use-active-pokemon-list";
+} from "@/hooks/use-active-pokemon-list";
 
 export type { PokemonListItem };
 
@@ -32,8 +29,6 @@ export function usePokemonListModel() {
   const [draftType, setDraftType] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [pokemons, setPokemons] = useState<PokemonListItem[]>([]);
-  const [lastSyncedData, setLastSyncedData] =
-    useState<ListPokemonQuery | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
 
@@ -48,25 +43,6 @@ export function usePokemonListModel() {
   const isInitialLoading = loading && offset === 0 && pokemons.length === 0;
   const isLoadingMore = loading && offset > 0;
   const hasMore = (data?.pokemon.length ?? 0) === PAGE_SIZE;
-
-  function loadMore() {
-    if (loading || !hasMore) {
-      return;
-    }
-
-    setOffset((current) => current + PAGE_SIZE);
-  }
-
-  async function refresh() {
-    setIsRefreshing(true);
-    setOffset(0);
-
-    try {
-      await refetchFirstPage();
-    } finally {
-      setIsRefreshing(false);
-    }
-  }
 
   function openDetail(id: number) {
     router.push(`/pokemon/${id}`);
@@ -95,20 +71,35 @@ export function usePokemonListModel() {
     setIsFilterModalVisible(false);
   }
 
-  // Acumula as páginas recebidas: substitui na primeira página e concatena nas
-  // seguintes. Comparar a referência de `data` evita reprocessar a cada render.
-  function syncAccumulatedPokemons() {
-    if (!data?.pokemon || data === lastSyncedData) {
+  function loadMore() {
+    if (loading || !hasMore) {
       return;
     }
 
-    setLastSyncedData(data);
-    setPokemons((current) =>
-      offset === 0 ? data.pokemon : mergeById(current, data.pokemon),
-    );
+    setOffset((current) => current + PAGE_SIZE);
   }
 
-  syncAccumulatedPokemons();
+  async function refresh() {
+    setIsRefreshing(true);
+    setOffset(0);
+
+    try {
+      await refetchFirstPage();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!data?.pokemon) {
+      return;
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPokemons((current) =>
+      offset === 0 ? data.pokemon : appendNewById(current, data.pokemon),
+    );
+  }, [data, offset]);
 
   return {
     pokemons,

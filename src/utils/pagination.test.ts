@@ -1,11 +1,11 @@
-import { mergeById } from "./array";
+import { appendNewById } from "./pagination";
 
-describe("mergeById", () => {
+describe("appendNewById", () => {
   it("concatena itens quando não há sobreposição", () => {
     const current = [{ id: 1, name: "a" }];
     const incoming = [{ id: 2, name: "b" }];
 
-    expect(mergeById(current, incoming)).toEqual([
+    expect(appendNewById(current, incoming)).toEqual([
       { id: 1, name: "a" },
       { id: 2, name: "b" },
     ]);
@@ -15,7 +15,7 @@ describe("mergeById", () => {
     const current = [{ id: 1, name: "a" }];
     const incoming = [{ id: 1, name: "a" }];
 
-    expect(mergeById(current, incoming)).toEqual([{ id: 1, name: "a" }]);
+    expect(appendNewById(current, incoming)).toEqual([{ id: 1, name: "a" }]);
   });
 
   it("adiciona apenas itens novos em lista mista", () => {
@@ -28,7 +28,7 @@ describe("mergeById", () => {
       { id: 3, name: "c" },
     ];
 
-    expect(mergeById(current, incoming)).toEqual([
+    expect(appendNewById(current, incoming)).toEqual([
       { id: 1, name: "a" },
       { id: 2, name: "b" },
       { id: 3, name: "c" },

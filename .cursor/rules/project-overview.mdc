@@ -24,10 +24,12 @@ App React Native (Expo 56) que consome a PokéAPI GraphQL v1beta2.
 ## Estrutura
 
 - `src/app/` — rotas finas (apenas re-exportam features)
-- `src/features/<nome>/` — MVVM (pokemon-model, pokemon-view, index)
+- `src/screens/<nome>/` — MVVM (pokemon-model, pokemon-view)
+- `src/hooks/` — hooks de dados compartilhados (ex.: queries Apollo abstraídas)
 - `src/graphql/operations/` — queries `.graphql`
 - `src/graphql/generated/` — tipos gerados (não editar manualmente)
 - `src/lib/` — utilitários compartilhados
+- `src/utils/` — funções puras reutilizáveis
 
 ## Convenções
 
